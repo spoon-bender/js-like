@@ -218,7 +218,7 @@ RPG.Misc.IProjectile.prototype.launch = function(source, target, map) {
 }
 
 /**
- * Flying above a given cell
+ * Flying...
  * @returns {bool} still in flight?
  */
 RPG.Misc.IProjectile.prototype._fly = function() {
@@ -269,7 +269,7 @@ RPG.Misc.IProjectile.prototype._done = function() {
 }
 
 /**
- * Precompute trajectory + its visuals. Stop at first non-free cell.
+ * Precompute trajectory + its visuals. Stop at first non-free coords.
  * @param {RPG.Misc.Coords} source
  * @param {RPG.Misc.Coords} target
  * @param {RPG.Map} map

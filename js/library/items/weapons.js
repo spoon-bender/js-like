@@ -231,22 +231,23 @@ RPG.Items.Projectile.prototype._done = function() {
 	this._char = this._baseChar;
 	this._image = this._baseImage;
 
-	var cell = this._flight.cells[this._flight.cells.length-1];
-	var b = cell.getBeing();
-	var f = cell.getFeature();
+	var coords = this._flight.coords[this._flight.coords.length-1];
+	var map = this._owner.getMap();
+	var b = map.getBeing(coords);
+	var f = map.getFeature(coords);
 	var dropPossible = false;
 	
 	if (b) {
 		this._owner.attackRanged(b, this);
 	} else {
-		if (cell.isFree()) { 
+		if (map.isFree(coords)) { 
 			if (RPG.Rules.isProjectileRecovered(this)) {
-				cell.addItem(this);
+				map.addItem(this, coords);
 				var pc = RPG.Game.pc;
-				RPG.UI.map.redrawCell(cell);
+				RPG.UI.map.redrawCoords(coords);
 			}
 		} else {
-			var f = cell.getFeature() || cell;
+			var f = (map.getFeature(coords) || map.getCell(coords));
 			var s = RPG.Misc.format("%A hits %a.", this, f);
 			RPG.UI.buffer.message(s);
 		}

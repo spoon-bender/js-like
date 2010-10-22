@@ -121,26 +121,26 @@ RPG.Beings.Troll.prototype.init = function() {
  * @augments RPG.Beings.PC
  */
 RPG.Beings.God = OZ.Class().extend(RPG.Beings.PC);
-RPG.Beings.God.prototype.getVisibleCells = function() {
-	var arr = [];
-	var map = this._cell.getMap();
-	var size = map.getSize();
+RPG.Beings.God.prototype.getVisibleCoords = function() {
+	var all = {};
+	var size = this._map.getSize();
 	var c = new RPG.Misc.Coords(0, 0);
 	for (var i=0;i<size.x;i++) {
 		for (var j=0;j<size.y;j++) {
 			c.x = i;
 			c.y = j;
-			var cell = map.at(c);
-			if (cell) { arr.push(cell); }
+			c.updateHash();
+			var cell = this._map.getCell(c);
+			if (cell) { all[c.hash] = c.clone(); }
 		}
 	}
-	return arr;
+	return all;
 }
 
 RPG.Beings.God.prototype.updateVisibility = function() {
 }
 
-RPG.Beings.God.prototype.canSee = function(cell) {
+RPG.Beings.God.prototype.canSee = function(coords) {
 	return true;
 }
 

@@ -56,8 +56,8 @@ RPG.Game.getStory = function() {
 	return this._story;
 }
 
-RPG.Game.startMap = function(map, cell) {
-	this.setMap(map, cell);
+RPG.Game.startMap = function(map, coords) {
+	this.setMap(map, coords);
 	this._engine.unlock();
 }
 
@@ -76,18 +76,18 @@ RPG.Game.end = function() {
 }
 
 /**
- * Change to a new map by moving PC onto "cell"
+ * Change to a new map by moving PC onto "coords"
  * @param {RPG.Map} map New map
- * @param {RPG.Cells.BaseCell} cell PC's cell
+ * @param {RPG.Misc.Coords} coords PC's coords
  */
-RPG.Game.setMap = function(map, cell) {
+RPG.Game.setMap = function(map, coords) {
 	this._map = map; /* remember where we are */
 
 	RPG.UI.status.updateMap(map.getId()); /* update statusbar */	
 	RPG.UI.map.resize(map.getSize()); /* draw the map */
 	RPG.UI.map.redrawAll();
 
-	var result = this.pc.move(cell); /* move PC to the cell -> redraw visible part */
+	var result = this.pc.move(coords); /* move PC to the coords -> redraw visible part */
 	this._engine.useMap(map); /* switch engine to new actorset */
 	return result; /* return result of move action */
 }

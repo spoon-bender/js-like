@@ -10,13 +10,14 @@ RPG.Decorators.Hidden.prototype.decorate = function(map, percentage) {
 		for (var j=0;j<size.y;j++) {
 			c.x = i;
 			c.y = j;
-			var cell = map.at(c);
+			c.updateHash();
+			var cell = map.getCell(c);
 			if (!(cell instanceof RPG.Cells.Corridor)) { continue; }
 			if (this._freeNeighbors(map, c) != 2) { continue; }
 			if (Math.random() >= percentage) { continue; }
 			
 			var fake = new RPG.Cells.Wall.Fake(cell);
-			map.setCell(c, fake);
+			map.setCell(fake, c);
 		}
 	}
 	return this;
