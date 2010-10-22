@@ -803,11 +803,11 @@ RPG.Story.Village.prototype._nextMazeDungeon = function(staircase) {
 
 	RPG.Decorators.Hidden.getInstance().decorate(map, 0.01);
 	
-	var corners = map.cellsInTwoCorners();
+	var corners = map.coordsInTwoCorners();
 
 	/* stairs up */
 	var up = new RPG.Features.Staircase.Up();
-	corners[0].setFeature(up);
+	map.setFeature(up, corners[0]);
 	
 	/* bind to previous dungeon */
 	up.setTarget(staircase.getCell());
@@ -815,10 +815,10 @@ RPG.Story.Village.prototype._nextMazeDungeon = function(staircase) {
 	/* stairs down */
 	if (this._mazeDepth < this._maxMazeDepth) {
 		var down = new RPG.Features.Staircase.Down();
-		corners[1].setFeature(down);
+		map.setFeature(down, corners[1]);
 		this._staircases["maze"] = down;
 	} else {
-		corners[1].addItem(this._necklace);
+		map.addItem(this._necklace, corners[1]);
 	}
 	
 	/* enemies */

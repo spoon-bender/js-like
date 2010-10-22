@@ -749,7 +749,7 @@ RPG.Beings.BaseBeing.prototype.launch = function(projectile, cell) {
 		this._describeLaunch(p, cell);
 	}
 	
-	p.launch(this._cell, cell.getCoords());
+	p.launch(this._coords, cell.getCoords(), this._map);
 	return RPG.ACTION_TIME;
 }
 

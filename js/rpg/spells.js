@@ -63,22 +63,21 @@ RPG.Spells.Attack.prototype.explode = function(center, radius, ignoreCenter) {
 	RPG.UI.map.removeProjectiles();
 	RPG.Game.getEngine().lock();
 	var map = this._caster.getCell().getMap();
-	var cells = map.cellsInArea(center, radius);
-	if (ignoreCenter) { cells.shift(); }
+	var coords = map.getCoordsInArea(center, radius);
+	if (ignoreCenter) { coords.shift(); }
 	
-	for (var i=0;i<cells.length;i++) {
-		var cell = cells[i];
-		RPG.UI.map.addProjectile(cell.getCoords(), this);
+	for (var i=0;i<coords.length;i++) {
+		var c = coords[i];
+		RPG.UI.map.addProjectile(c, this);
 	}
 	setTimeout(this.bind(function(){
-		this._afterExplosion(cells);
+		this._afterExplosion(coords);
 	}), 100);
 }
 
-RPG.Spells.Attack.prototype._afterExplosion = function(cells) {
-	for (var i=0;i<cells.length;i++) {
-		var cell = cells[i];
-		var b = cell.getBeing();
+RPG.Spells.Attack.prototype._afterExplosion = function(coords) {
+	for (var i=0;i<coords.length;i++) {
+		var b = this._caster.getMap().getBeing(coords[i]);
 		if (!b) { continue; }
 		this._caster.attackMagic(b, this);
 	}
@@ -105,7 +104,7 @@ RPG.Spells.Projectile.prototype.init = function(caster) {
 }
 
 RPG.Spells.Projectile.prototype.cast = function(target) {
-	this.launch(this._caster.getCell(), target);
+	this.launch(this._caster.getCoords(), target, this._caster.getMap());
 }
 
 RPG.Spells.Projectile.prototype._fly = function() {
@@ -120,10 +119,10 @@ RPG.Spells.Projectile.prototype._fly = function() {
 	}
 }
 
-RPG.Spells.Projectile.prototype.computeTrajectory = function(source, target) {
+RPG.Spells.Projectile.prototype.computeTrajectory = function(source, target, map) {
 	if (this._type == RPG.SPELL_TARGET) { 
 		/* same as basic projectiles */
-		return RPG.Misc.IProjectile.prototype.computeTrajectory.call(this, source, target); 
+		return RPG.Misc.IProjectile.prototype.computeTrajectory.apply(this, arguments); 
 	}
 	
 	if (this._type == RPG.SPELL_DIRECTION) {

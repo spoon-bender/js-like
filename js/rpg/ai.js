@@ -328,16 +328,16 @@ RPG.AI.Task.prototype.go = function() {
 RPG.AI.Wander = OZ.Class().extend(RPG.AI.Task);
 RPG.AI.Wander.prototype.go = function() {
 	var being = this._ai.getBeing();
-	var cell = being.getCell();
-	var map = cell.getMap();
+	var coords = being.getCoords();
+	var map = being.getMap();
 	
-	var neighbors = map.cellsInCircle(cell.getCoords(), 1);
+	var neighbors = map.getCoordsInCircle(coords, 1);
 	var avail = [null];
 	for (var i=0;i<neighbors.length;i++) {
-		if (neighbors[i].isFree()) { avail.push(neighbors[i]); }
+		if (map.isFree(neighbors[i])) { avail.push(neighbors[i]); }
 	}
 	
-	var target = avail[Math.floor(Math.random() * avail.length)];
+	var target = avail.random();
 	if (target) {
 		this._ai.setActionResult(being.move(target));
 	} else {

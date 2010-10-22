@@ -40,6 +40,8 @@ RPG.Misc.Coords.fromString = function(str) {
 RPG.Misc.Coords.prototype.init = function(x, y) {
 	this.x = x;
 	this.y = y;
+	this.hash = "";
+	this.updateHash();
 }
 
 RPG.Misc.Coords.prototype.toString = function() {
@@ -57,15 +59,37 @@ RPG.Misc.Coords.prototype.clone = function() {
 }
 
 RPG.Misc.Coords.prototype.plus = function(c) {
-	this.x += c.x;
-	this.y += c.y;
+	if (c instanceof RPG.Misc.Coords) {
+		this.x += c.x;
+		this.y += c.y;
+	} else {
+		var y = (arguments.length > 1 ? arguments[1] : c);
+		this.x += c;
+		this.y += y;
+	}
+	this.updateHash();
 	return this;
 }
 
 RPG.Misc.Coords.prototype.minus = function(c) {
-	this.x -= c.x;
-	this.y -= c.y;
+	if (c instanceof RPG.Misc.Coords) {
+		this.x -= c.x;
+		this.y -= c.y;
+	} else {
+		var y = (arguments.length > 1 ? arguments[1] : c);
+		this.x -= c;
+		this.y -= y;
+	}
+	this.updateHash();
 	return this;
+}
+
+RPG.Misc.Coords.prototype.updateHash = function() {
+	this.hash = this.x + "," + this.y;
+}
+
+RPG.Misc.Coords.prototype.neighbor = function(dir) {
+	return this.clone().plus(RPG.DIR[dir]);
 }
 
 /**
@@ -147,7 +171,7 @@ RPG.Misc.IProjectile.prototype._initProjectile = function() {
 	
 	this._flight = {
 		index: -1,
-		cells: [],
+		coords: [],
 		chars: [],
 		images: []
 	}
@@ -181,11 +205,12 @@ RPG.Misc.IProjectile.prototype.getRange = function() {
 
 /**
  * Launch this projectile
- * @param {RPG.Cells.BaseCell} source
- * @param {?} target
+ * @param {RPG.Misc.Coords} source
+ * @param {RPG.Misc.Coords} target
+ * @param {RPG.Map} map
  */
-RPG.Misc.IProjectile.prototype.launch = function(source, target) {
-	this.computeTrajectory(source, target);
+RPG.Misc.IProjectile.prototype.launch = function(source, target, map) {
+	this.computeTrajectory(source, target, map);
 	this._flying = true;
 	RPG.Game.getEngine().lock();
 	var interval = 75;
@@ -197,27 +222,28 @@ RPG.Misc.IProjectile.prototype.launch = function(source, target) {
  * @returns {bool} still in flight?
  */
 RPG.Misc.IProjectile.prototype._fly = function() {
-	var cell = this._flight.cells[this._flight.index];
-	RPG.UI.map.addProjectile(cell.getCoords(), this);
+	var coords = this._flight.coords[this._flight.index];
+	RPG.UI.map.addProjectile(coords, this);
 }
 
 /**
  * Preview projectile's planned trajectory
- * @param {RPG.Cells.BaseCell} source
- * @param {?} target
+ * @param {RPG.Misc.Coords} source
+ * @param {RPG.Misc.Coords} target
+ * @param {RPG.Map} map
  */
-RPG.Misc.IProjectile.prototype.showTrajectory = function(source, target) {
-	this.computeTrajectory(source, target);
+RPG.Misc.IProjectile.prototype.showTrajectory = function(source, target, map) {
+	this.computeTrajectory(source, target, map);
 	var pc = RPG.Game.pc;
 	
 	RPG.UI.map.removeProjectiles();
-	for (var i=0;i<this._flight.cells.length;i++) {
-		var cell = this._flight.cells[i];
+	for (var i=0;i<this._flight.coords.length;i++) {
+		var coords = this._flight.coords[i];
 		
-		if (!pc.canSee(cell)) { continue; }
+		if (!pc.canSee(coords)) { continue; }
 		
-		var mark = (i+1 == this._flight.cells.length ? RPG.Misc.IProjectile.endMark : RPG.Misc.IProjectile.mark);
-		RPG.UI.map.addProjectile(cell.getCoords(), mark);
+		var mark = (i+1 == this._flight.coords.length ? RPG.Misc.IProjectile.endMark : RPG.Misc.IProjectile.mark);
+		RPG.UI.map.addProjectile(coords, mark);
 	}
 }
 
@@ -225,7 +251,7 @@ RPG.Misc.IProjectile.prototype._step = function() {
 	this._flight.index++;
 	var index = this._flight.index;
 	
-	if (index == this._flight.cells.length) { 
+	if (index == this._flight.coords.length) { 
 		clearInterval(this._interval); 
 		this._done();
 		return;
@@ -233,7 +259,7 @@ RPG.Misc.IProjectile.prototype._step = function() {
 	
 	this._char = this._flight.chars[index];
 	this._image = this._flight.images[index];
-	this._fly(this._flight.cells[index]);
+	this._fly(this._flight.coords[index]);
 }
 
 RPG.Misc.IProjectile.prototype._done = function() {
@@ -244,31 +270,32 @@ RPG.Misc.IProjectile.prototype._done = function() {
 
 /**
  * Precompute trajectory + its visuals. Stop at first non-free cell.
- * @param {RPG.Cells.BaseCell} source
+ * @param {RPG.Misc.Coords} source
  * @param {RPG.Misc.Coords} target
+ * @param {RPG.Map} map
  */
-RPG.Misc.IProjectile.prototype.computeTrajectory = function(source, target) {
+RPG.Misc.IProjectile.prototype.computeTrajectory = function(source, target, map) {
 	this._flight.index = -1;
-	this._flight.cells = [];
+	this._flight.coords = [];
 	this._flight.chars = [];
 	this._flight.images = [];
 
 	var map = RPG.Game.getMap();
-	var cells = map.cellsInLine(source.getCoords(), target);
-	var max = Math.min(this.getRange()+1, cells.length);
+	var coords = map.getCoordsInLine(source, target);
+	var max = Math.min(this.getRange()+1, coords.length);
 
 	for (var i=1;i<max;i++) {
-		var cell = cells[i];
-		var prev = cells[i-1];
+		var c = coords[i];
+		var prev = coords[i-1];
 
-		this._flight.cells.push(cell);
-		var dir = prev.getCoords().dirTo(cell.getCoords());
+		this._flight.coords.push(c);
+		var dir = prev.dirTo(c);
 		this._flight.chars.push(this._chars[dir]);
 		var image = this._baseImage;
 		if (this._suffixes[dir]) { image += "-" + this._suffixes[dir]; }
 		this._flight.images.push(image);
 
-		if (!cell.isFree()) { break; }
+		if (!map.isFree(c)) { break; }
 	}
 	
 	return this._flight;

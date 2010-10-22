@@ -36,13 +36,12 @@ RPG.UI.Command.prototype._click = function(e) {
 RPG.UI.Command.prototype._surroundingDoors = function(closed) {
 	var doors = false;
 	var dc = 0;
-	var cell = RPG.Game.pc.getCell();
-	var map = cell.getMap();
-	var center = cell.getCoords();
+	var center = RPG.Game.pc.getCoords();
+	var map = RPG.Game.pc.getMap();
 	
-	var cells = map.cellsInCircle(cell.getCoords(), 1, false);
-	for (var i=0;i<cells.length;i++) {
-		var f = cells[i].getFeature();
+	var coords = map.getCoordsInCircle(center, 1, false);
+	for (var i=0;i<coords.length;i++) {
+		var f = map.getFeature(coords[i]);
 		if (f && f instanceof RPG.Features.Door && f.isClosed() == closed) {
 			dc++;
 			doors = f;
@@ -62,15 +61,14 @@ RPG.UI.Command.prototype._surroundingDoors = function(closed) {
 RPG.UI.Command.prototype._surroundingBeings = function(closed) {
 	var list = [];
 
-	var cell = RPG.Game.pc.getCell();
-	var map = cell.getMap();
-	var center = cell.getCoords();
+	var map = RPG.Game.pc.getMap();
+	var center = RPG.Game.pc.getCoords();
 	
-	var cells = map.cellsInCircle(cell.getCoords(), 1, false);
+	var coords = map.getCoordsInCircle(center, 1, false);
 
-	for (var i=0;i<cells.length;i++) {
-		var b = cells[i].getBeing();
-			if (b) { list.push(b); }
+	for (var i=0;i<coords.length;i++) {
+		var b = map.getBeing(coords[i]);
+		if (b) { list.push(b); }
 	}
 	
 	return list;
@@ -584,7 +582,7 @@ RPG.UI.Command.Autowalk.prototype._check = function() {
 		
 		/* try to change direction, because it is not possible to continue */
 		var freecount = 0;
-		var cells = map.cellsInCircle(coords, 1, false);
+		var cells = map.getCoordsInCircle(coords, 1, false);
 		for (var i=0;i<cells.length;i++) { if (cells[i].isFree()) { freecount++; } }
 		if (freecount > 2) { return false; } /* too many options to go */
 		

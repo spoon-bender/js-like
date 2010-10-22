@@ -23,23 +23,24 @@ RPG.AI.WanderInArea.prototype.init = function(corner1, corner2) {
 RPG.AI.WanderInArea.prototype.go = function() {
 	var being = this._ai.getBeing();
 	var cell = being.getCell();
+	var coords = being.getCoords();
 	
-	if (!this._inArea(cell.getCoords())) { /* PANIC! We are not in our area */
+	if (!this._inArea(coords)) { /* PANIC! We are not in our area */
 		this._ai.setActionResult(being.wait());
 		return RPG.AI_OK;
 	}
 	
-	var map = cell.getMap();
-	var neighbors = map.cellsInCircle(cell.getCoords(), 1);
+	var map = being.getMap();
+	var neighbors = map.getCoordsInCircle(coords, 1);
 	var avail = [null];
 	for (var i=0;i<neighbors.length;i++) {
 		var neighbor = neighbors[i];
-		if (!neighbor.isFree()) { continue; }
-		if (!this._inArea(neighbor.getCoords())) { continue; }
+		if (!map.isFree(neighbor)) { continue; }
+		if (!this._inArea(neighbor)) { continue; }
 		avail.push(neighbor);
 	}
 	
-	var target = avail[Math.floor(Math.random() * avail.length)];
+	var target = avail.random();
 	if (target) {
 		this._ai.setActionResult(being.move(target));
 	} else {
@@ -134,7 +135,7 @@ RPG.AI.AttackRanged.prototype.go = function() {
 	if (!projectile.isLaunchable()) { return RPG.AI_IMPOSSIBLE; } /* missing a launcher */
 
 	var targetCoords = this._being.getCell().getCoords();
-	var trajectory = projectile.computeTrajectory(being.getCell(), targetCoords);
+	var trajectory = projectile.computeTrajectory(being.getCoords(), targetCoords, being.getMap());
 	var last = trajectory.cells.pop();
 	if (last != this._being.getCell()) { return RPG.AI_IMPOSSIBLE; } /* some obstacle or we are too far */
 	
@@ -155,14 +156,14 @@ RPG.AI.AttackMagic.prototype.init = function(being) {
 
 RPG.AI.AttackMagic.prototype.go = function() {
 	var being = this._ai.getBeing();
-	var cell = being.getCell();
+	var coords = being.getCoords();
 	var target = this._being.getCell();
 	
 	/* MagicBolt */
 	if (being.hasSpell(RPG.Spells.MagicBolt, true)) {
 		var spell = new RPG.Spells.MagicBolt(being);
 		for (var i=0;i<8;i++) { /* find some direction */
-			var trajectory = spell.computeTrajectory(cell, i);
+			var trajectory = spell.computeTrajectory(coords, i, being.getMap());
 			var selfHit = false;
 			var targetHit = false;
 			for (var j=0;j<trajectory.cells.length;j++) { /* check if target is hit and we are not */
