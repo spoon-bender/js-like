@@ -17,6 +17,9 @@ RPG.Decorators = {};
 RPG.Effects = {};
 
 /** @namespace */
+RPG.Factories = {};
+
+/** @namespace */
 RPG.Feats = {};
 
 /** @namespace */
@@ -41,7 +44,7 @@ RPG.Quests = {};
 RPG.Races = {};
 
 /** @namespace */
-RPG.Rooms = {};
+RPG.Areas = {};
 
 /** @namespace */
 RPG.Rules = {};
@@ -233,6 +236,7 @@ RPG.CONFIRM_NA			= 0;
 RPG.CONFIRM_ASK			= 1;
 /** @constant */
 RPG.CONFIRM_DONE		= 2;
+
 /**
  * Generates a normally distributed random number, mean = 0.
  * @param {float} stddev Standard deviation. ~95% of the absolute values will be lower than 2*stddev.

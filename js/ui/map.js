@@ -85,7 +85,7 @@ RPG.UI.BaseMap.prototype.redrawAll = function() {
 		for (var j=0;j<size.y;j++) {
 			coords.x = i;
 			coords.y = j;
-			coords.updateHash();
+			coords.updateID();
 			this._redrawCoords(coords);
 		}
 	}

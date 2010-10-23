@@ -129,9 +129,9 @@ RPG.Beings.God.prototype.getVisibleCoords = function() {
 		for (var j=0;j<size.y;j++) {
 			c.x = i;
 			c.y = j;
-			c.updateHash();
+			c.updateID();
 			var cell = this._map.getCell(c);
-			if (cell) { all[c.hash] = c.clone(); }
+			if (cell) { all[c.id] = c.clone(); }
 		}
 	}
 	return all;

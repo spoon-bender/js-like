@@ -122,8 +122,11 @@ RPG.Beings.BaseBeing.prototype.hasSpell = function(spell, castable) {
  * This being is located on a new coords. 
  * @param {RPG.Misc.Coords} coords
  * @param {bool} [ignoreOldCoords]
+ * FIXME this code should be moved to map
  */
 RPG.Beings.BaseBeing.prototype.setCoords = function(coords, ignoreOldCoords) {
+	this._coords = coords;
+
 	this._notifyEnterables(this._coords, coords);
 
 	/* update old coords */
@@ -133,8 +136,6 @@ RPG.Beings.BaseBeing.prototype.setCoords = function(coords, ignoreOldCoords) {
 
 	/* set new coords */
 	if (this._coords) { this._map.setBeing(this, this._coords); }
-
-	return this;
 }
 
 RPG.Beings.BaseBeing.prototype.getCoords = function() {

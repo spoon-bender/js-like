@@ -236,26 +236,25 @@ RPG.Features.Staircase.prototype.init = function() {
 }
 
 RPG.Features.Staircase.prototype.enter = function(being) {
-	var cell = this.getTarget();
+	var target = this.getTarget();
 
-	if (cell) {	
+	if (target) {	
 		/* switch maps */
-		var map = cell.getMap();
-		return RPG.Game.setMap(map, cell);
+		return RPG.Game.setMap(this._map, target);
 	} else {
 		return being.wait();
 	}
 }
 
-RPG.Features.Staircase.prototype.setTarget = function(cell) {
-	this._target = cell;
+RPG.Features.Staircase.prototype.setTarget = function(coords) {
+	this._target = coords;
 }
 
 /**
  * @returns {RPG.Cells.BaseCell}
  */
 RPG.Features.Staircase.prototype.getTarget = function() {
-	if (!this._target) { 
+	if (!this._target) { /* ask story to generate some */
 		this._target = RPG.Game.getStory().staircaseCallback(this);
 	}
 	return this._target;
@@ -326,3 +325,4 @@ RPG.Rooms.Shop.prototype.setShopkeeper = function(being) {
 	var ai = new RPG.AI.Shopkeeper(being, this);
 	being.setAI(ai);
 }
+

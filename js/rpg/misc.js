@@ -40,8 +40,8 @@ RPG.Misc.Coords.fromString = function(str) {
 RPG.Misc.Coords.prototype.init = function(x, y) {
 	this.x = x;
 	this.y = y;
-	this.hash = "";
-	this.updateHash();
+	this.id = "";
+	this.updateID();
 }
 
 RPG.Misc.Coords.prototype.toString = function() {
@@ -59,33 +59,21 @@ RPG.Misc.Coords.prototype.clone = function() {
 }
 
 RPG.Misc.Coords.prototype.plus = function(c) {
-	if (c instanceof RPG.Misc.Coords) {
-		this.x += c.x;
-		this.y += c.y;
-	} else {
-		var y = (arguments.length > 1 ? arguments[1] : c);
-		this.x += c;
-		this.y += y;
-	}
-	this.updateHash();
+	this.x += c.x;
+	this.y += c.y;
+	this.updateID();
 	return this;
 }
 
 RPG.Misc.Coords.prototype.minus = function(c) {
-	if (c instanceof RPG.Misc.Coords) {
-		this.x -= c.x;
-		this.y -= c.y;
-	} else {
-		var y = (arguments.length > 1 ? arguments[1] : c);
-		this.x -= c;
-		this.y -= y;
-	}
-	this.updateHash();
+	this.x -= c.x;
+	this.y -= c.y;
+	this.updateID();
 	return this;
 }
 
-RPG.Misc.Coords.prototype.updateHash = function() {
-	this.hash = this.x + "," + this.y;
+RPG.Misc.Coords.prototype.updateID = function() {
+	this.id = this.x + "," + this.y;
 }
 
 RPG.Misc.Coords.prototype.neighbor = function(dir) {
@@ -280,7 +268,6 @@ RPG.Misc.IProjectile.prototype.computeTrajectory = function(source, target, map)
 	this._flight.chars = [];
 	this._flight.images = [];
 
-	var map = RPG.Game.getMap();
 	var coords = map.getCoordsInLine(source, target);
 	var max = Math.min(this.getRange()+1, coords.length);
 

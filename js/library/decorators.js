@@ -10,7 +10,7 @@ RPG.Decorators.Hidden.prototype.decorate = function(map, percentage) {
 		for (var j=0;j<size.y;j++) {
 			c.x = i;
 			c.y = j;
-			c.updateHash();
+			c.updateID();
 			var cell = map.getCell(c);
 			if (!(cell instanceof RPG.Cells.Corridor)) { continue; }
 			if (this._freeNeighbors(map, c) != 2) { continue; }
@@ -31,7 +31,7 @@ RPG.Decorators.Beings = OZ.Singleton().extend(RPG.Decorators.BaseDecorator);
 RPG.Decorators.Beings.prototype.decorate = function(map, count) {
 	var danger = map.getDanger();
 	for (var i=0;i<count;i++) {
-		var b = RPG.Beings.NPC.getInstance(danger);
+		var b = RPG.Factories.npcs.getInstance(danger);
 		var c = map.getFreeCell(true);
 		if (!c) { return this; }
 		b.setCell(c);
@@ -47,7 +47,7 @@ RPG.Decorators.Items = OZ.Singleton().extend(RPG.Decorators.BaseDecorator);
 RPG.Decorators.Items.prototype.decorate = function(map, count) {
 	var danger = map.getDanger();
 	for (var i=0;i<count;i++) {
-		var item = RPG.Items.getInstance(danger);
+		var item = RPG.Factories.items.getInstance(danger);
 		var c = map.getFreeCell(true);
 		c.addItem(item);
 	}
@@ -62,7 +62,7 @@ RPG.Decorators.Traps = OZ.Singleton().extend(RPG.Decorators.BaseDecorator);
 RPG.Decorators.Traps.prototype.addTraps = function(map, count) {
 	var danger = map.getDanger();
 	for (var i=0;i<count;i++) {
-		var trap = RPG.Features.Trap.getInstance(danger);
+		var trap = RPG.Factories.traps.getInstance(danger);
 		var c = map.getFreeCell(true);
 		c.setFeature(trap);
 	}
@@ -188,7 +188,7 @@ RPG.Decorators.Treasure.prototype._generateTreasure = function(danger) {
 	if (Math.randomPercentage() < 67) {
 		return RPG.Items.Gold.factory.method.call(RPG.Items.Gold, danger);
 	} else {
-		return RPG.Items.Gem.getInstance(danger);
+		return RPG.Factories.gems.getInstance(danger);
 	}
 }
 

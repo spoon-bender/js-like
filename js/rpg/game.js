@@ -11,22 +11,7 @@ RPG.Game = {
 }
 
 RPG.Game.init = function() {
-	var f = new RPG.Misc.Factory().add(RPG.Items.BaseItem);
-	RPG.Items.getInstance = f.bind(f.getInstance);
-
-	var f = new RPG.Misc.Factory().add(RPG.Items.Gem);
-	RPG.Items.Gem.getInstance = f.bind(f.getInstance);
-
-	var f = new RPG.Misc.Factory().add(RPG.Beings.NPC);
-	RPG.Beings.NPC.getInstance = f.bind(f.getInstance);
-	RPG.Beings.NPC.getClass = f.bind(f.getClass);
-
-	var f = new RPG.Misc.Factory().add(RPG.Features.Trap);
-	RPG.Features.Trap.getInstance = f.bind(f.getInstance);
-
-	var f = new RPG.Misc.Factory().add(RPG.Spells.BaseSpell);
-	RPG.Spells.getInstance = f.bind(f.getInstance);
-	RPG.Spells.getClass = f.bind(f.getClass);
+	this._initFactories();
 
 	this._engine = new RPG.Engine();
 }
@@ -182,6 +167,14 @@ RPG.Game._runStack = function(stack, readyStateChange) {
 		}
 	}
 	step();
+}
+
+RPG.Game._initFactories = function() {
+	RPG.Factories.items = new RPG.Misc.Factory().add(RPG.Items.BaseItem);
+	RPG.Factories.gems = new RPG.Misc.Factory().add(RPG.Items.Gem);
+	RPG.Factories.npcs = new RPG.Misc.Factory().add(RPG.Beings.NPC);
+	RPG.Factories.traps = new RPG.Misc.Factory().add(RPG.Features.Trap);
+	RPG.Factories.spells = new RPG.Misc.Factory().add(RPG.Spells.BaseSpell);
 }
 
 /**

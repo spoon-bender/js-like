@@ -1148,7 +1148,7 @@ RPG.UI.Command.Launch.prototype.exec = function(coords) {
 		RPG.UI.setMode(RPG.UI_NORMAL);
 		var map = pc.getMap();
 		
-		if (coords.hash == pc.getCoords().hash) {
+		if (coords.id == pc.getCoords().id) {
 			RPG.UI.buffer.message("You do not want to do that, do you?");
 			return;
 		}

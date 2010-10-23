@@ -134,7 +134,7 @@ RPG.Beings.PC.prototype.describeIs = function() {
  * PC uses a different approach - maintains a list of visible coords
  */
 RPG.Beings.PC.prototype.canSee = function(coords) {
-	return (coords.hash in this._visibleCoordsHash);
+	return (coords.id in this._visibleCoordsHash);
 }
 
 /**
@@ -152,7 +152,7 @@ RPG.Beings.PC.prototype.updateVisibility = function() {
 	var arcs = [];
 	
 	/* results */
-	this._visibleCoordsHash = {this._coords.hash: this._coords};
+	this._visibleCoordsHash = {this._coords.id: this._coords};
 	
 	/* number of cells in current ring */
 	var cellCount = 0;
@@ -172,7 +172,7 @@ RPG.Beings.PC.prototype.updateVisibility = function() {
 
 			var startArc = (i-0.5) * arcsPerCell + 0.5;
 			if (this._visibleCoords(!map.visibleThrough(c), startArc, arcsPerCell, arcs)) { 
-				this._visibleCoordsHash[coords.hash] = coords; 
+				this._visibleCoordsHash[coords.id] = coords; 
 			}
 
 			/* cutoff? */
@@ -447,7 +447,7 @@ RPG.Beings.PC.prototype.kick = function(coords) {
 	var being = this._map.getBeing(coords);
 	var items = this._map.getItems(coords);
 	
-	if (coords.hash == this._cell.hash) {
+	if (coords.id == this._cell.id) {
 		RPG.UI.buffer.message("You would not do that, would you?");
 		return RPG.ACTION_NO_TIME;
 	}
