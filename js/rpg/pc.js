@@ -79,7 +79,7 @@ RPG.Beings.PC.prototype._updateFeat = function(feat) {
 
 RPG.Beings.PC.prototype.setMap = function(map) {
 	this.parent(map);
-	this._visibleCoords = {};
+	this._visibleCoordsHash = {};
 }
 
 /**
@@ -147,7 +147,8 @@ RPG.Beings.PC.prototype.updateVisibility = function() {
 	var arcs = [];
 	
 	/* results */
-	this._visibleCoordsHash = {this._coords.id: this._coords};
+	this._visibleCoordsHash = {};
+	this._visibleCoordsHash[this._coords.id] = this._coords;
 	
 	/* number of cells in current ring */
 	var cellCount = 0;
@@ -167,7 +168,7 @@ RPG.Beings.PC.prototype.updateVisibility = function() {
 
 			var startArc = (i-0.5) * arcsPerCell + 0.5;
 			if (this._visibleCoords(!map.visibleThrough(c), startArc, arcsPerCell, arcs)) { 
-				this._visibleCoordsHash[coords.id] = coords; 
+				this._visibleCoordsHash[c.id] = c; 
 			}
 
 			/* cutoff? */

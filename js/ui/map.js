@@ -36,17 +36,15 @@ RPG.UI.BaseMap.prototype.resize = function(size) {
 
 /**
  * Redraw a game coords. If this cell is outside a visibility range, do nothing.
- * FIXME
  */
 RPG.UI.BaseMap.prototype.redrawCoords = function(coords) {
 	if (!RPG.Game.pc.canSee(coords)) { return; }
-	cell.setMemoryState(RPG.MAP_VISIBLE);
+	RPG.Game.pc.getMap().setMemory(RPG.MAP_VISIBLE, coords);
 	this._redrawCoords(coords);
 }
 
 /**
  * Redraw the visible area.
- * FIXME
  */
 RPG.UI.BaseMap.prototype.redrawVisible = function() {
 	var map = RPG.Game.getMap();
@@ -60,7 +58,7 @@ RPG.UI.BaseMap.prototype.redrawVisible = function() {
 	for (var hash in oldVisible) {
 		if (!(hash in newVisible)) { /* this one is no longer visible */
 			var coords = oldVisible[hash];
-			coords.setMemoryState(RPG.MAP_REMEMBERED);
+			map.setMemory(RPG.MAP_REMEMBERED, coords);
 			this._redrawCoords(coords);
 		}
 	}
@@ -68,7 +66,7 @@ RPG.UI.BaseMap.prototype.redrawVisible = function() {
 	/* take all currently visible and mark them as visible */
 	for (var hash in newVisible) {
 		var coords = newVisible[hash];
-		coords.setMemoryState(RPG.MAP_VISIBLE);
+		map.setMemory(RPG.MAP_VISIBLE, coords);
 		this._redrawCoords(coords);
 	}
 }
@@ -122,9 +120,9 @@ RPG.UI.BaseMap.prototype.removeProjectiles = function() {
 
 /**
  * Force redraw a coords
- * FIXME
  */
 RPG.UI.BaseMap.prototype._redrawCoords = function(coords) {
+	var map = RPG.Game.pc.getMap();
 	var what = this._dom.data[coords.x][coords.y];
 
 	var index = this._projectiles.indexOf(what);
@@ -133,7 +131,7 @@ RPG.UI.BaseMap.prototype._redrawCoords = function(coords) {
 		what.removeProjectile();
 	}
 
-	what.update(coords.getMemory());
+	what.update(map.getMemory(coords));
 }
 
 RPG.UI.BaseMap.prototype._resize = function() {
@@ -150,7 +148,7 @@ RPG.UI.BaseCell.prototype.init = function(owner, coords) {
 
 /**
  * Update cell contents
- * @param {object} memory Cell memory
+ * @param {object} memory Map memory
  */
 RPG.UI.BaseCell.prototype.update = function(memory) {
 }
@@ -453,9 +451,6 @@ RPG.UI.CanvasMap.prototype.setFocus = function(coords) {
 	this._ctx.stroke();
 }
 
-/**
- * FIXME 
- */
 RPG.UI.CanvasMap.prototype._redrawCoords = function(coords, what) {
 	var x = coords.x * this._charWidth;
 	var y = coords.y * this._charHeight;
@@ -463,9 +458,8 @@ RPG.UI.CanvasMap.prototype._redrawCoords = function(coords, what) {
 	
 	var todo = what;
 	if (!todo) {
-		var cell = RPG.Game.getMap().at(coords);
-		if (cell) {
-			var memory = cell.getMemory();
+		var memory = RPG.Game.getMap().getMemory(coords);
+		if (memory) {
 			if (memory.state == RPG.MAP_REMEMBERED) { this._ctx.globalAlpha = 0.5; }
 			if (memory.data.length) { todo = memory.data[memory.data.length-1]; }
 		}

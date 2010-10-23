@@ -118,6 +118,7 @@ RPG.Decorators.Doors.prototype.decorate = function(map, room, options) {
 			c.updateID();
 			
 			var feature = map.getFeature(c)
+			var cell = map.getCell(c)
 			if (cell instanceof RPG.Cells.Wall) {
 				/* try fake corridor, if applicable */
 				if (Math.random() >= o.fakeCorridors) { continue; } /* bad luck */

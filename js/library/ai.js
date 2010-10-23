@@ -447,7 +447,7 @@ RPG.AI.Shopkeeper.prototype.init = function(being, shop) {
 	this._guarding = null;
 	this._items = [];
 
-	var c = shop.getDoor().getCoords();
+	var c = shop.getDoor();
 	var corner1 = shop.getCorner1();
 	var corner2 = shop.getCorner2();
 	var c1 = new RPG.Misc.Coords(c.x-1, c.y-1);

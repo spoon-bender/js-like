@@ -10,41 +10,6 @@ RPG.Cells.BaseCell.prototype.init = function() {
 	this._initVisuals();
 	this._modifiers = {};
 	this._type = RPG.BLOCKS_NOTHING;
-	this._memory = { /* FIXME remove */
-		state: RPG.MAP_UNKNOWN,
-		data: []
-	}
-}
-
-RPG.Cells.BaseCell.prototype.getMemory = function() {
-	return this._memory;
-}
-
-RPG.Cells.BaseCell.prototype.setMemoryState = function(state) {
-	this._memory.state = state;
-	if (state == RPG.MAP_UNKNOWN) { 
-		this._memory.data = [];
-		return;
-	}
-	
-	var arr = [this];
-	
-	if (this._being && state == RPG.MAP_VISIBLE) { /* being? */
-		arr.push(this._being);
-	} else if (this._items.length) {
-		arr.push(this._items[this._items.length-1]);
-	} else if (this._feature && RPG.Game.pc.knowsFeature(this._feature)) {
-		arr.push(this._feature);
-	}
-	
-	/* remembered stack uses clones */
-	if (state == RPG.MAP_REMEMBERED) {
-		for (var i=0;i<arr.length;i++) {
-			arr[i] = new RPG.Visual.Trace(arr[i]);
-		}
-	}
-	
-	this._memory.data = arr;
 }
 
 RPG.Cells.BaseCell.prototype.getType = function() {
@@ -103,6 +68,14 @@ RPG.Areas.Room.prototype.init = function(corner1, corner2) {
 	this.parent();
 	this._corner1 = corner1.clone();
 	this._corner2 = corner2.clone();
+}
+
+RPG.Areas.Room.prototype.getCorner1 = function() {
+	return this._corner1;
+}
+
+RPG.Areas.Room.prototype.getCorner2 = function() {
+	return this._corner2;
 }
 
 RPG.Areas.Room.prototype.getCenter = function() {
@@ -172,19 +145,6 @@ RPG.Features.BaseFeature.prototype.visibleThrough = function() {
  */
 RPG.Map = OZ.Class().implement(RPG.Misc.IEnterable);
 
-/**
- * Populates cells in this map based on an array of arrays of integers.
- * @param {int[][]} intMap
- * @param {RPG.Cells.BaseCell[]} cells Array of used cells
- */
-RPG.Map.fromIntMap = function(intMap, cells) {
-	var w = intMap.length;
-	var h = intMap[0].length;
-	var map = new this(new RPG.Misc.Coords(w, h));
-	map.fromIntMap(intMap, cells);
-	return map;
-}
-
 RPG.Map.prototype.init = function(id, size, danger) {
 	this._modifiers = {};
 	this._id = id;
@@ -201,9 +161,15 @@ RPG.Map.prototype.init = function(id, size, danger) {
 	this._beings = {}; 
 	this._items = {}; 
 	this._features = {}; 
+	this._memory = {};
 
 }
 
+/**
+ * Populates cells in this map based on an array of arrays of integers.
+ * @param {int[][]} intMap
+ * @param {RPG.Cells.BaseCell[]} cells Array of used cells
+ */
 RPG.Map.prototype.fromIntMap = function(intMap, cells) {
 	var w = intMap.length;
 	var h = intMap[0].length;
@@ -224,11 +190,13 @@ RPG.Map.prototype.fromIntMap = function(intMap, cells) {
 		for (var y=0;y<h;y++) {
 			coords.x = x;
 			coords.y = y;
+			coords.updateID();
             var cell = tmpCells[x][y];
+            var type = cell.getType();
 
 			/* passable section */
-			if (cell.visibleThrough()) {
-				map.setCell(cell, coords);
+			if (type < RPG.BLOCKS_MOVEMENT) {
+				this.setCell(cell, coords);
 				continue;
 			}
 			
@@ -244,12 +212,12 @@ RPG.Map.prototype.fromIntMap = function(intMap, cells) {
 					neighbor.x = i;
 					neighbor.y = j;
 					var neighborCell = tmpCells[i][j];
-					if (neighborCell.visibleThrough()) { ok = true; }
+					if (neighborCell.getType() < RPG.BLOCKS_MOVEMENT) { ok = true; }
 				}
 			}
 			
 			if (ok) {
-				map.setCell(cell, coords);
+				this.setCell(cell, coords);
 				continue;
 			}
 		}
@@ -274,14 +242,8 @@ RPG.Map.prototype.leaving = function(being) {
 	RPG.Misc.IEnterable.prototype.leaving.apply(this, arguments);
 	if (being != RPG.Game.pc) { return; }
 
-	/* FIXME mark visible cells as remembered */
-	for (var i=0;i<this._size.x;i++) {
-		for (var j=0;j<this._size.y;j++) {
-			var c = this._data[i][j];
-			if (!c) { continue; }
-			var m = c.getMemory();
-			if (m.state == RPG.MAP_VISIBLE) { c.setMemoryState(RPG.MAP_REMEMBERED); }
-		}
+	for (var id in this._memory) {
+		this._setMemory(RPG.MAP_REMEMBERED, id);
 	}
 }
 
@@ -313,6 +275,37 @@ RPG.Map.prototype.setSound = function(sound) {
 
 RPG.Map.prototype.getSound = function() {
 	return this._sound;
+}
+
+RPG.Map.prototype.getMemory = function(coords) {
+	return this._memory[coords.id];
+}
+
+RPG.Map.prototype.setMemory = function(state, coords) {
+	this._setMemory(state, coords.id);
+}
+
+RPG.Map.prototype._setMemory = function(state, id) {
+	var m = {state:state, data:[]};
+	this._memory[id] = m;
+	
+	if (state == RPG.MAP_UNKNOWN) { return; }
+	m.data.push(this._cells[id]);
+	
+	if (this._beings[id] && state == RPG.MAP_VISIBLE) { /* being? */
+		m.data.push(this._beings[id]);
+	} else if (this._items[id] && this._items[id].length) {
+		m.data.push(this._items[id][this._items[id].length-1]);
+	} else if (this._features[id] && RPG.Game.pc.knowsFeature(this._features[id])) {
+		m.data.push(this._features[id]);
+	}
+	
+	/* remembered stack uses clones */
+	if (state == RPG.MAP_REMEMBERED) {
+		for (var i=0;i<m.data.length;i++) {
+			m.data[i] = new RPG.Visual.Trace(m.data[i]);
+		}
+	}
 }
 
 /**
@@ -387,7 +380,7 @@ RPG.Map.prototype.setBeing = function(being, coords, ignoreOldPosition) {
 		this.entering(being);
 		being.setMap(this);
 	} else if (!ignoreOldPosition) { /* same map - remove being from old coords */
-		delete this._beings[oldCoords];
+		delete this._beings[oldCoords.id];
 	}
 	
 	if (oldArea != newArea) { /* area change */
@@ -396,7 +389,7 @@ RPG.Map.prototype.setBeing = function(being, coords, ignoreOldPosition) {
 	}
 	
 	if (oldCell != newCell) { /* cell change */
-		oldCell.leaving(being);
+		if (oldCell) { oldCell.leaving(being); }
 		newCell.entering(being);
 	}
 
@@ -671,7 +664,7 @@ RPG.Map.prototype.getCoordsInTwoCorners = function() {
 RPG.Map.prototype.isFree = function(coords) {
 	var id = coords.id;
 	if (this._beings[id]) { return false; }
-	var c = this._cells[c];
+	var c = this._cells[id];
 	if (!c) { return false; }
 	
 	if (c.getType() >= RPG.BLOCKS_MOVEMENT) { return false; }
@@ -693,7 +686,26 @@ RPG.Map.prototype._cellFromNumber = function(celltype, cells) {
     return new cells[celltype]();
 }
 
-/********************************************************************/
+/**
+ * @class Dungeon map
+ * @augments RPG.Map
+ */
+RPG.Map.Dungeon = OZ.Class().extend(RPG.Map);
+
+RPG.Map.Dungeon.prototype.init = function(id, size, danger) {
+	this.parent(id, size, danger);
+	this._rooms = [];
+}
+
+RPG.Map.Dungeon.prototype.addRoom = function(room) {
+	this._rooms.push(room);
+	this.addArea(room);
+}
+
+RPG.Map.Dungeon.prototype.getRooms = function() {
+	return this._rooms;
+}
+
 
 /**
  * @class Map decorator
@@ -736,7 +748,7 @@ RPG.Generators.BaseGenerator.prototype.generate = function(id, danger) {
 }
 
 RPG.Generators.BaseGenerator.prototype._convertToMap = function(id, danger) {
-	var map = new RPG.Map(id, this._size, danger);
+	var map = new RPG.Map.Dungeon(id, this._size, danger);
 	map.fromIntMap(this._bitMap, this._maptypes);
 	
 	for (var i=0;i<this._rooms.length;i++) {
@@ -782,7 +794,7 @@ RPG.Generators.BaseGenerator.prototype._blankMap = function() {
 }
 
 RPG.Generators.BaseGenerator.prototype._digRoom = function(corner1, corner2) {
-	var room = new RPG.Rooms.BaseRoom(corner1, corner2);
+	var room = new RPG.Areas.Room(corner1, corner2);
 	this._rooms.push(room);
 	
 	for (var i=corner1.x;i<=corner2.x;i++) {

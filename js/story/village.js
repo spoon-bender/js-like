@@ -93,8 +93,8 @@ RPG.Map.Village.prototype._buildPeople = function() {
 
 	var shop1 = new RPG.Misc.Coords(18, 11);
 	var shop2 = new RPG.Misc.Coords(20, 13);
-	var shop = new RPG.Rooms.Shop(shop1, shop2);
-	this.addRoom(shop);
+	var shop = new RPG.Areas.Shop(shop1, shop2);
+	this.addArea(shop);
 	
     this.setFeature(doors_healer, new RPG.Misc.Coords(12,3));
     this.setFeature(doors_smith, new RPG.Misc.Coords(21,7));
@@ -223,7 +223,7 @@ RPG.Beings.VillageWitch.prototype.init = function() {
 
 	var broom = new RPG.Items.Broom();
 	this.addItem(broom);
-	this.equip(RPG.SLOT_WEAPON,broom);
+	this.equip(RPG.SLOT_WEAPON, broom);
 	
 	this._description = "witch";
 	this._char = "@";

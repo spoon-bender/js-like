@@ -710,7 +710,7 @@ RPG.UI.Command.Trap.prototype.init = function() {
 
 RPG.UI.Command.Trap.prototype.exec = function() {
 	var pc = RPG.Game.pc;
-	var map = pc.getMap():
+	var map = pc.getMap();
 	var f = map.getFeature(pc.getCoords());
 	if (f && f instanceof RPG.Features.Trap && pc.knowsFeature(f)) {
 		var result = pc.activateTrap(f);

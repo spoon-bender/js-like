@@ -286,7 +286,7 @@ RPG.Features.Staircase.Up.prototype.init = function() {
 }
 
 /**
- * @class Shop room
+ * @class Shop area
  * @augments RPG.Areas.Room
  */
 RPG.Areas.Shop = OZ.Class().extend(RPG.Areas.Room);
@@ -316,13 +316,12 @@ RPG.Areas.Shop.prototype.setMap = function(map) {
 	if (!this._door) { throw new Error("Shop without doors"); }
 }
 
-RPG.Rooms.Shop.prototype.getDoor = function() {
+RPG.Areas.Shop.prototype.getDoor = function() {
 	return this._door;
 }
 
-RPG.Rooms.Shop.prototype.setShopkeeper = function(being) {
+RPG.Areas.Shop.prototype.setShopkeeper = function(being) {
 	this._map.setBeing(being, this._door);
-	
 	var ai = new RPG.AI.Shopkeeper(being, this);
 	being.setAI(ai);
 }

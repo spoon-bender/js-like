@@ -68,11 +68,11 @@ RPG.Game.end = function() {
 RPG.Game.setMap = function(map, coords) {
 	this._map = map; /* remember where we are */
 
-	RPG.UI.status.updateMap(map.getId()); /* update statusbar */	
+	RPG.UI.status.updateMap(map.getID()); /* update statusbar */	
 	RPG.UI.map.resize(map.getSize()); /* draw the map */
 	RPG.UI.map.redrawAll();
 
-	var result = this.pc.move(coords); /* move PC to the coords -> redraw visible part */
+	var result = map.setBeing(this.pc, coords); /* move PC to the coords -> redraw visible part */
 	this._engine.useMap(map); /* switch engine to new actorset */
 	return result; /* return result of move action */
 }

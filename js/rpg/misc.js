@@ -350,7 +350,7 @@ RPG.Misc.IDialog.prototype.advanceDialog = function(optionIndex, being) {
 }
 
 /**
- * @class Interface for enterable objects (cells, rooms, maps)
+ * @class Interface for enterable objects (cells, areas, maps)
  * @augments RPG.Misc.IModifier
  */
 RPG.Misc.IEnterable = OZ.Class()
