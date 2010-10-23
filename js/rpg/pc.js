@@ -77,14 +77,9 @@ RPG.Beings.PC.prototype._updateFeat = function(feat) {
 	return value;
 }
 
-/**
- * FIXME! setMap?
- */
-RPG.Beings.PC.prototype.setCoords = function(coords) {
-	if (this._coords && coords) {
-		if (this._getMap() != cell.getMap()) { this._visibleCells = []; }
-	}
-	this.parent(coords);
+RPG.Beings.PC.prototype.setMap = function(map) {
+	this.parent(map);
+	this._visibleCoords = {};
 }
 
 /**
@@ -408,7 +403,7 @@ RPG.Beings.PC.prototype._search = function(coords) {
 		return 1;
 	}
 	
-	var f = cell.getFeature();
+	var f = this._map.getFeature(coords);
 	if (f && f instanceof RPG.Features.Trap && !this.knowsFeature(f) && RPG.Rules.isTrapDetected(this, f)) {
 		this._knownTraps.push(f);
 		var s = RPG.Misc.format("You discover %a!", f);

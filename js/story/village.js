@@ -99,31 +99,27 @@ RPG.Map.Village.prototype._buildPeople = function() {
     this.setFeature(doors_healer, new RPG.Misc.Coords(12,3));
     this.setFeature(doors_smith, new RPG.Misc.Coords(21,7));
     this.setFeature(doors_townhall, new RPG.Misc.Coords(28,7));
-	/*
-    c = this.at(new RPG.Misc.Coords(20,10));
-    c.setFeature(doors_shop);
-	*/
     this.setFeature(stairs_up, new RPG.Misc.Coords(20,2));
 
     var task = null;
 
 	this._elder = new RPG.Beings.VillageElder();
-	this._elder.setMap(this).setCoords(new RPG.Misc.Coords(30, 5));
+	this.setBeing(this._elder, new RPG.Misc.Coords(30, 5));
     task = new RPG.AI.Wait();
 	this._elder.getAI().setDefaultTask(task);
 
     this._witch = new RPG.Beings.VillageWitch();
-    this._witch.setMap(this).setCoords(new RPG.Misc.Coords(2,7));
+    this.setBeing(this._witch, new RPG.Misc.Coords(2,7));
     task = new RPG.AI.Wait();
 	this._witch.getAI().setDefaultTask(task);
 
     this._healer = new RPG.Beings.VillageHealer();
-    this._healer.setMap(this).setCoords(new RPG.Misc.Coords(11,3));
+    this.setBeing(this._healer, new RPG.Misc.Coords(11,3));
     task = new RPG.AI.WanderInArea(new RPG.Misc.Coords(10, 2), new RPG.Misc.Coords(11, 4));
 	this._healer.getAI().setDefaultTask(task);
 
     this._smith = new RPG.Beings.VillageSmith();
-    this._smith.setMap(this).setCoords(new RPG.Misc.Coords(20,6));
+    this.setBeing(this._smith, new RPG.Misc.Coords(20,6));
     task = new RPG.AI.WanderInArea(new RPG.Misc.Coords(19, 5), new RPG.Misc.Coords(21, 6));
 	this._smith.getAI().setDefaultTask(task);
 
@@ -131,12 +127,12 @@ RPG.Map.Village.prototype._buildPeople = function() {
 	shop.setShopkeeper(this._shopkeeper);
 
     this._guard_one = new RPG.Beings.VillageGuard();
-    this._guard_one.setMap(this).setCoords(new RPG.Misc.Coords(27,6));
+    this.setBeing(this._guard_one, new RPG.Misc.Coords(27,6));
     task = new RPG.AI.Wait();
 	this._guard_one.getAI().setDefaultTask(task);
 
     this._guard_two = new RPG.Beings.VillageGuard();
-    this._guard_two.setMap(this).setCoords(new RPG.Misc.Coords(27,8));
+    this.setBeing(this._guard_two, new RPG.Misc.Coords(27,8));
     task = new RPG.AI.Wait();
 	this._guard_two.getAI().setDefaultTask(task);
 
@@ -154,17 +150,9 @@ RPG.Map.Village.prototype._buildPeople = function() {
 		villager.getAI().setDialogText(chat[0]);
 		villager.getAI().setDialogSound(chat[1]);
 
-        c = this.getFreeCoords();
-        villager.setMap(this).setCoords(c);
+        this.setBeing(villager, this.getFreeCoords());
     }
 	
-	/*
-	var thrower = new RPG.Beings.GoblinRockthrower();
-	throwser.setCell(this.at(new RPG.Misc.Coords(22,3)));
-	thrower.setFeat(RPG.FEAT_MAGIC, 20);
-	thrower.fullStats();
-	thrower.addSpell(RPG.Spells.Fireball);
-	*/
 }
 
 /**
@@ -697,14 +685,14 @@ RPG.Story.Village.prototype._villageMap = function() {
 
 RPG.Story.Village.prototype._showElderStaircase = function() {
     var staircase = new RPG.Features.Staircase.Down();
-    this._village.at(new RPG.Misc.Coords(32, 14)).setFeature(staircase);
+    this._village.setFeature(staircase, new RPG.Misc.Coords(32, 14));
     this._staircases["elder"] = staircase;
 	RPG.UI.map.redrawVisible(); 
 }
 
 RPG.Story.Village.prototype._showMazeStaircase = function() {
     var staircase = new RPG.Features.Staircase.Down();
-    this._village.at(new RPG.Misc.Coords(1, 1)).setFeature(staircase);
+    this._village.setFeature(staircase, new RPG.Misc.Coords(1, 1));
     this._staircases["maze"] = staircase;
 	RPG.UI.map.redrawVisible(); 
 }
@@ -746,7 +734,7 @@ RPG.Story.Village.prototype._nextElderDungeon = function(staircase) {
 	var index = arr.indexOf(roomUp);
 	arr.splice(index, 1);
 	var up = new RPG.Features.Staircase.Up();
-	map.at(roomUp.getCenter()).setFeature(up);
+	map.setFeature(up, roomUp.getCenter());
 	
 	/* bind to previous dungeon */
 	up.setTarget(staircase.getCoords());
@@ -758,7 +746,7 @@ RPG.Story.Village.prototype._nextElderDungeon = function(staircase) {
 		var index = arr.indexOf(roomDown);
 		arr.splice(index, 1);
 		var down = new RPG.Features.Staircase.Down();
-		map.at(roomDown.getCenter()).setFeature(down);
+		map.setFeature(down, roomDown.getCenter());
 		this._staircases["elder"] = down;
 	} else {
 		/* last level */
@@ -771,7 +759,7 @@ RPG.Story.Village.prototype._nextElderDungeon = function(staircase) {
 		RPG.Decorators.Doors.getInstance().decorate(map, roomTreasure, {locked: 1});
 		RPG.Decorators.Treasure.getInstance().decorate(map, roomTreasure, {treasure: 1});
 
-		this._boss.setCoords(roomTreasure.getCenter());
+		map.setBeing(this._boss, roomTreasure.getCenter());
 	}
 	
 	/* artifact */

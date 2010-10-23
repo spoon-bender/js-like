@@ -130,6 +130,7 @@ RPG.Features.BaseFeature = OZ.Class()
 							.implement(RPG.Misc.IEnterable);
 RPG.Features.BaseFeature.prototype.init = function() {
 	this._coords = null;
+	this._map = null;
 	this._initVisuals();
 	this._modifiers = {};
 	this._type = RPG.BLOCKS_NOTHING;
@@ -141,6 +142,10 @@ RPG.Features.BaseFeature.prototype.setCoords = function(coords) {
 
 RPG.Features.BaseFeature.prototype.getCoords = function() {
 	return this._coords;
+}
+
+RPG.Features.BaseFeature.prototype.setMap = function(map) {
+	this._map = map;
 }
 
 RPG.Features.BaseFeature.prototype.getType = function() {
@@ -188,14 +193,15 @@ RPG.Map.prototype.init = function(id, size, danger) {
 	this._size = size.clone();
 	this._danger = danger;
 	
+	this._areas = [];
+	this._areasByCoords = {};
+
 	/* hashmaps */
 	this._cells = {}; 
 	this._beings = {}; 
 	this._items = {}; 
 	this._features = {}; 
 
-	this._areas = [];
-	this._areasByCoords = {};
 }
 
 RPG.Map.prototype.fromIntMap = function(intMap, cells) {
@@ -333,6 +339,7 @@ RPG.Map.prototype.removeItem = function(item) {
 		var index = list.indexOf(item);
 		if (index != -1) {
 			list.splice(index, 1);
+			if (!list.length) { delete this._items[hash]; }
 			return;
 		}
 	}
@@ -344,25 +351,69 @@ RPG.Map.prototype.getFeature = function(coords) {
 }
 
 RPG.Map.prototype.setFeature = function(feature, coords) {
-	this._features[coords.id] = feature;
-	feature.setCoords(coords);
+	if (feature) {
+		this._features[coords.id] = feature;
+		feature.setCoords(coords);
+	} else if (this._features[coords.id]) {
+		delete this._features[coords.id];
+	}
 }
 
 RPG.Map.prototype.getBeing = function(coords) {
 	return this._beings[coords.id];
 }
 
-RPG.Map.prototype.setBeing = function(being, coords) {
+RPG.Map.prototype.setBeing = function(being, coords, ignoreOldPosition) {
+	if (!being) { /* just remove being. it should be here. */
+		var b = this._beings[coords.id];
+		if (b) {
+			this.leaving(b);
+			delete this._beings[coords.id];
+		}
+		return;
+	}
+	
+	var oldCoords = being.getCoords();
+	var newCoords = coords;
+	var oldMap = being.getMap();
+	var newMap = this;
+	var oldArea = (oldMap ? oldMap.getArea(oldCoords) : null);
+	var newArea = this.getArea(newCoords);
+	var oldCell = (oldMap ? oldMap.getCell(oldCoords) : null);
+	var newCell = this.getCell(newCoords);
+	
+	if (oldMap != newMap) { /* map change */
+		if (oldMap) { oldMap.leaving(being); }
+		this.entering(being);
+		being.setMap(this);
+	} else if (!ignoreOldPosition) { /* same map - remove being from old coords */
+		delete this._beings[oldCoords];
+	}
+	
+	if (oldArea != newArea) { /* area change */
+		if (oldArea) { oldArea.leaving(being); }
+		if (newArea) { newArea.entering(being); }
+	}
+	
+	if (oldCell != newCell) { /* cell change */
+		oldCell.leaving(being);
+		newCell.entering(being);
+	}
+
 	this._beings[coords.id] = being;
 	being.setCoords(coords);
 }
-
+	
 RPG.Map.prototype.getCell = function(coords) {
 	return this._cells[coords.id];
 }
 
 RPG.Map.prototype.setCell = function(cell, coords) {
-	this._cells[coords.id] = cell;
+	if (cell) {
+		this._cells[coords.id] = cell;
+	} else if (this._cells[coords.id]) {
+		delete this._cells[coords.id];
+	}
 }
 
 
@@ -467,7 +518,7 @@ RPG.Map.prototype.getCoordsInCircle = function(center, radius, includeInvalid) {
 }
 
 /**
- * Line connecting two cells
+ * Line connecting two coords
  * @param {RPG.Misc.Coords} c1
  * @param {RPG.Misc.Coords} c2
  * @returns {RPG.Misc.Coords[]}
@@ -568,7 +619,7 @@ RPG.Map.prototype.getCorners = function() {
 }
 
 /**
- * Returns first free cell closest to a coordinate
+ * Returns first free coords closest to a coordinate
  * @param {RPG.Misc.Coords} center
  * @param {int} max radius
  */
@@ -610,8 +661,8 @@ RPG.Map.prototype.getCoordsInTwoCorners = function() {
 
 	for (var i=0;i<indexes.length;i++) {
 		var center = corners[indexes[i]];
-		var cell = this.getClosestRandomFreeCoords(center);
-		if (cell) { result.push(cell) }
+		var coords = this.getClosestRandomFreeCoords(center);
+		if (coords) { result.push(coords) }
 	}
 
 	return result;

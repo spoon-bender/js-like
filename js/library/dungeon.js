@@ -140,7 +140,7 @@ RPG.Features.Door.prototype.isLocked = function() {
  */
 RPG.Features.Door.prototype.damage = function(amount) {
 	this._hp -= amount;
-	if (this._hp <= 0) { this._cell.setFeature(null); }
+	if (this._hp <= 0) { this._map.setFeature(null, this._coords); }
 	return (this._hp > 0);
 }
 
@@ -183,8 +183,9 @@ RPG.Features.Trap.Teleport.prototype.init = function() {
 }
 
 RPG.Features.Trap.Teleport.prototype.setOff = function(e) {
-	var c = this._cell.getMap().getFreeCell();
-	this._cell.getBeing().teleport(c);
+	var c = this._map.getFreeCoords();
+	var being = this._map.getBeing(this._coords);
+	being.teleport(c);
 }
 
 /**
@@ -204,8 +205,8 @@ RPG.Features.Trap.Pit.prototype.init = function() {
 }
 
 RPG.Features.Trap.Pit.prototype.setOff = function() {
-	var canSee = RPG.Game.pc.canSee(this._cell);
-	var being = this._cell.getBeing();
+	var canSee = RPG.Game.pc.canSee(this._coords);
+	var being = this._map.getBeing(this._coords);
 
 	if (canSee) {
 		var verb = RPG.Misc.verb("fall", being);
@@ -286,16 +287,16 @@ RPG.Features.Staircase.Up.prototype.init = function() {
 
 /**
  * @class Shop room
- * @augments RPG.Rooms.BaseRoom
+ * @augments RPG.Areas.Room
  */
-RPG.Rooms.Shop = OZ.Class().extend(RPG.Rooms.BaseRoom);
-RPG.Rooms.Shop.prototype.init = function(corner1, corner2) {
+RPG.Areas.Shop = OZ.Class().extend(RPG.Areas.Room);
+RPG.Areas.Shop.prototype.init = function(corner1, corner2) {
 	this.parent(corner1, corner2);
 	this._door = null;
 	this._welcome = "You entered a shop.";
 }
 
-RPG.Rooms.Shop.prototype.setMap = function(map) {
+RPG.Areas.Shop.prototype.setMap = function(map) {
 	this.parent(map);
 
 	var c = new RPG.Misc.Coords(0, 0);
@@ -304,11 +305,11 @@ RPG.Rooms.Shop.prototype.setMap = function(map) {
 			if (i >= this._corner1.x && i <= this._corner2.x && j >= this._corner1.y && j <= this._corner2.y) { continue; }
 			c.x = i;
 			c.y = j;
-			var cell = map.at(c);
-			if (!cell.isFree()) { continue; }
+			c.updateID();
+			if (!this._map.isFree(c)) { continue; }
 			
 			if (this._door) { throw new Error("Shop cannot have >1 doors"); }
-			this._door = cell;
+			this._door = c.clone();
 		}
 	}
 	
@@ -320,9 +321,8 @@ RPG.Rooms.Shop.prototype.getDoor = function() {
 }
 
 RPG.Rooms.Shop.prototype.setShopkeeper = function(being) {
-	being.setCell(this._door);
+	this._map.setBeing(being, this._door);
 	
 	var ai = new RPG.AI.Shopkeeper(being, this);
 	being.setAI(ai);
 }
-

@@ -12,6 +12,7 @@ RPG.Beings.BaseBeing.prototype.init = function(race) {
 	this._name = "";
 	this._slots = {};
 	this._coords = null;
+	this._map = null;
 	this._gender = RPG.GENDER_NEUTER;
 	this._items = [];
 	this._stats = {};
@@ -121,25 +122,21 @@ RPG.Beings.BaseBeing.prototype.hasSpell = function(spell, castable) {
 /**
  * This being is located on a new coords. 
  * @param {RPG.Misc.Coords} coords
- * @param {bool} [ignoreOldCoords]
- * FIXME this code should be moved to map
  */
-RPG.Beings.BaseBeing.prototype.setCoords = function(coords, ignoreOldCoords) {
+RPG.Beings.BaseBeing.prototype.setCoords = function(coords) {
 	this._coords = coords;
-
-	this._notifyEnterables(this._coords, coords);
-
-	/* update old coords */
-	if (this._coords && !ignoreOldCoords) { this._map.setBeing(null, this._coords); }
-	
-	this._coords = coords;
-
-	/* set new coords */
-	if (this._coords) { this._map.setBeing(this, this._coords); }
 }
 
 RPG.Beings.BaseBeing.prototype.getCoords = function() {
 	return this._coords;
+}
+
+RPG.Beings.BaseBeing.prototype.setMap = function(map) {
+	this._map = map;
+}
+
+RPG.Beings.BaseBeing.prototype.getMap = function() {
+	return this._map;
 }
 
 /**
@@ -541,7 +538,7 @@ RPG.Beings.BaseBeing.prototype.wait = function() {
  * @param {bool} [ignoreOldCoords]
  */
 RPG.Beings.BaseBeing.prototype.move = function(target, ignoreOldCoords) {
-	this.setCoords(target, ignoreOldCoords);
+	this._map.setBeing(this, target, ignoreOldCoords);
 	return RPG.ACTION_TIME;
 }
 
@@ -836,46 +833,6 @@ RPG.Beings.BaseBeing.prototype.attackRanged = function(being, projectile) {
 }
 
 /* -------------------- PRIVATE --------------- */
-
-/**
- * Notify all interested parties about coords change.
- * This might be refactored to some other component.
- * FIXME
- */
-RPG.Beings.BaseBeing.prototype._notifyEnterables = function(oldCoords, newCoords) {
-	var oldEnterables = [];
-	var newEnterables = [];
-	
-	/* 1st enterable - cell */
-	oldEnterables.push(oldCell);
-	newEnterables.push(newCell);
-	
-	/* 2nd enterable - feature */
-	oldEnterables.push(oldCell && oldCell.getFeature());
-	newEnterables.push(newCell && newCell.getFeature());
-	
-	/* 3rd enterable - room */
-	var oldRoom = oldCell && oldCell.getRoom();
-	var newRoom = newCell && newCell.getRoom();
-	if (oldRoom != newRoom) {
-		oldEnterables.push(oldRoom);
-		newEnterables.push(newRoom);
-	}
-
-	/* 4th enterable - map */
-	var oldMap = oldCell && oldCell.getMap();
-	var newMap = newCell && newCell.getMap();
-	if (oldMap != newMap) {
-		oldEnterables.push(oldMap);
-		newEnterables.push(newMap);
-	}
-
-	var count = oldEnterables.length;
-	for (var i=0;i<count;i++) {
-		if (oldEnterables[i]) { oldEnterables[i].leaving(this, newEnterables[i]); }
-		if (newEnterables[i]) { newEnterables[i].entering(this, oldEnterables[i]); }
-	}
-}
 
 RPG.Beings.BaseBeing.prototype._describeLaunch = function(projectile, target) {
 }

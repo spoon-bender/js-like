@@ -115,10 +115,9 @@ RPG.Decorators.Doors.prototype.decorate = function(map, room, options) {
 			
 			c.x = i;
 			c.y = j;
-			var cell = map.at(c);
-			if (!cell) { continue; }
+			c.updateID();
 			
-			var feature = cell.getFeature()
+			var feature = map.getFeature(c)
 			if (cell instanceof RPG.Cells.Wall) {
 				/* try fake corridor, if applicable */
 				if (Math.random() >= o.fakeCorridors) { continue; } /* bad luck */
@@ -126,7 +125,7 @@ RPG.Decorators.Doors.prototype.decorate = function(map, room, options) {
 				if (nc != 4) { continue; } /* bad neighbor count */
 				
 				var after = c.clone().plus(dir);
-				if (!map.isValid(after) || !(map.at(after) instanceof RPG.Cells.Corridor)) { continue; } /* bad layout */
+				if (!map.isValid(after) || !(map.getCell(after) instanceof RPG.Cells.Corridor)) { continue; } /* bad layout */
 				
 				/* fake corridor */
 				var fake = new RPG.Cells.Wall.Fake(new o.corridor());
@@ -171,8 +170,7 @@ RPG.Decorators.Treasure.prototype.decorate = function(map, room, options) {
 	var c2 = room.getCorner2();
 	for (var i=c1.x;i<=c2.x;i++) {
 		for (var j=c1.y;j<=c2.y;j++) {
-			var cell = map.at(new RPG.Misc.Coords(i, j));
-			if (!cell.isFree()) { continue; }
+			if (!map.isFree(new RPG.Misc.Coords(i, j))) { continue; }
 
 			if (Math.random() < o.treasure) {
 				var treasure = this._generateTreasure(danger);
