@@ -32,9 +32,9 @@ RPG.Decorators.Beings.prototype.decorate = function(map, count) {
 	var danger = map.getDanger();
 	for (var i=0;i<count;i++) {
 		var b = RPG.Factories.npcs.getInstance(danger);
-		var c = map.getFreeCell(true);
+		var c = map.getFreeCoords(true);
 		if (!c) { return this; }
-		b.setCell(c);
+		map.setBeing(b, c);
 	}
 	return this;
 }
@@ -48,8 +48,9 @@ RPG.Decorators.Items.prototype.decorate = function(map, count) {
 	var danger = map.getDanger();
 	for (var i=0;i<count;i++) {
 		var item = RPG.Factories.items.getInstance(danger);
-		var c = map.getFreeCell(true);
-		c.addItem(item);
+		var c = map.getFreeCoords(true);
+		if (!c) { return this; }
+		map.addItem(item, c);
 	}
 	return this;
 }
@@ -63,8 +64,9 @@ RPG.Decorators.Traps.prototype.addTraps = function(map, count) {
 	var danger = map.getDanger();
 	for (var i=0;i<count;i++) {
 		var trap = RPG.Factories.traps.getInstance(danger);
-		var c = map.getFreeCell(true);
-		c.setFeature(trap);
+		var c = map.getFreeCoords(true);
+		if (!c) { return this; }
+		map.setFeature(trap, c);
 	}
 	return this;
 }
@@ -128,8 +130,8 @@ RPG.Decorators.Doors.prototype.decorate = function(map, room, options) {
 				if (!map.isValid(after) || !(map.getCell(after) instanceof RPG.Cells.Corridor)) { continue; } /* bad layout */
 				
 				/* fake corridor */
-				var cctor = map.getCellTypes[0];
-				var corridor = RPG.Misc.Factories.cells.get(cctor);
+				var cctor = map.getCellTypes()[0];
+				var corridor = RPG.Factories.cells.get(cctor);
 				map.setCell(corridor, c);
 				var fake = new RPG.Cells.Wall.Fake();
 				map.setCell(fake, c);
@@ -139,7 +141,7 @@ RPG.Decorators.Doors.prototype.decorate = function(map, room, options) {
 			if (!feature && o.doors) {
 				/* add door */
 				feature = new RPG.Features.Door();
-				cell.setFeature(feature);
+				map.setFeature(feature, c);
 			}
 			
 			if (!(feature instanceof RPG.Features.Door)) { continue; } /* not a door */
@@ -173,11 +175,12 @@ RPG.Decorators.Treasure.prototype.decorate = function(map, room, options) {
 	var c2 = room.getCorner2();
 	for (var i=c1.x;i<=c2.x;i++) {
 		for (var j=c1.y;j<=c2.y;j++) {
-			if (!map.isFree(new RPG.Misc.Coords(i, j))) { continue; }
+			var c = new RPG.Misc.Coords(i, j);
+			if (!map.isFree(c)) { continue; }
 
 			if (Math.random() < o.treasure) {
 				var treasure = this._generateTreasure(danger);
-				cell.addItem(treasure);
+				map.addItem(treasure, c);
 				continue;
 			}
 			

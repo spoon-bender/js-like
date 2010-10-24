@@ -236,18 +236,18 @@ RPG.Features.Staircase.prototype.enter = function(being) {
 
 	if (target) {	
 		/* switch maps */
-		return RPG.Game.setMap(this._map, target);
+		return RPG.Game.setMap(this._target[0], this._target[1]);
 	} else {
 		return being.wait();
 	}
 }
 
-RPG.Features.Staircase.prototype.setTarget = function(coords) {
-	this._target = coords;
+RPG.Features.Staircase.prototype.setTarget = function(map, coords) {
+	this._target = [map, coords];
 }
 
 /**
- * @returns {RPG.Cells.BaseCell}
+ * @returns {[RPG.Map, RPG.Misc.Coords]}
  */
 RPG.Features.Staircase.prototype.getTarget = function() {
 	if (!this._target) { /* ask story to generate some */

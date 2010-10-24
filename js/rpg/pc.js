@@ -441,7 +441,7 @@ RPG.Beings.PC.prototype.kick = function(coords) {
 	var being = this._map.getBeing(coords);
 	var items = this._map.getItems(coords);
 	
-	if (coords.id == this._cell.id) {
+	if (coords.id == this._coords.id) {
 		RPG.UI.buffer.message("You would not do that, would you?");
 		return RPG.ACTION_NO_TIME;
 	}

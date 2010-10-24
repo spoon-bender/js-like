@@ -619,9 +619,9 @@ RPG.UI.Command.Autowalk.prototype._beingCount = function() {
 	var counter = 0;
 	var map = RPG.Game.pc.getMap();
 	var visible = RPG.Game.pc.getVisibleCoords();
-	for (var hash in visible) {
-		var coords = visible[i];
-		if (map.getBeing(visible[hash])) { counter++; }
+	for (var id in visible) {
+		var coords = visible[id];
+		if (map.getBeing(visible[id])) { counter++; }
 	}
 	return counter;
 }

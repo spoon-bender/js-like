@@ -144,6 +144,10 @@ RPG.Features.BaseFeature.prototype.setMap = function(map) {
 	this._map = map;
 }
 
+RPG.Features.BaseFeature.prototype.getMap = function() {
+	return this._map;
+}
+
 RPG.Features.BaseFeature.prototype.getType = function() {
 	return this._type;
 }
@@ -366,6 +370,7 @@ RPG.Map.prototype.getFeature = function(coords) {
 RPG.Map.prototype.setFeature = function(feature, coords) {
 	if (feature) {
 		this._features[coords.id] = feature;
+		feature.setMap(this);
 		feature.setCoords(coords);
 	} else if (this._features[coords.id]) {
 		delete this._features[coords.id];
@@ -522,7 +527,11 @@ RPG.Map.prototype.getCoordsInCircle = function(center, radius, includeInvalid) {
 		if (c.x < 0 || c.y < 0 || c.x >= W || c.y >= H) {
 			if (includeInvalid) { arr.push(null); }
 		} else {
-			arr.push(this._cells[c.id] ? c.clone() : null);
+			if (this._cells[c.id]) {
+				arr.push(c.clone());
+			} else if (includeInvalid) {
+				arr.push(null);
+			}
 		}
 		
 		var dir = dirs[Math.floor(i*dirs.length/count)];

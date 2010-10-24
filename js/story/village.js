@@ -294,7 +294,7 @@ RPG.Beings.VillageSmith.prototype.init = function() {
 	this.setFeat(RPG.FEAT_MAX_HP, 20);
 	
 	var hammer = new RPG.Items.Hammer();
-	this.equip(RPG.SLOT_WEAPON,hammer);
+	this.equip(RPG.SLOT_WEAPON, hammer);
 	
 	this._description = "dwarven smith";
 	this._char = "h";
@@ -733,7 +733,7 @@ RPG.Story.Village.prototype._nextElderDungeon = function(staircase) {
 	map.setFeature(up, roomUp.getCenter());
 	
 	/* bind to previous dungeon */
-	up.setTarget(staircase.getCoords());
+	up.setTarget(staircase.getMap(), staircase.getCoords());
 	
 	/* stairs down */
 	if (this._elderDepth < this._maxElderDepth) {
@@ -767,7 +767,7 @@ RPG.Story.Village.prototype._nextElderDungeon = function(staircase) {
 		map.addItem(tmp, coords);
 	}
 
-	return up.getCoords();
+	return [map, up.getCoords()];
 }
 
 RPG.Story.Village.prototype._nextMazeDungeon = function(staircase) {
@@ -786,7 +786,7 @@ RPG.Story.Village.prototype._nextMazeDungeon = function(staircase) {
 	map.setFeature(up, corners[0]);
 	
 	/* bind to previous dungeon */
-	up.setTarget(staircase.getCoords());
+	up.setTarget(staircase.getMap(), staircase.getCoords());
 	
 	/* stairs down */
 	if (this._mazeDepth < this._maxMazeDepth) {
@@ -809,7 +809,7 @@ RPG.Story.Village.prototype._nextMazeDungeon = function(staircase) {
 	var max = 1 + Math.floor(Math.random()*2);
 	RPG.Decorators.Traps.getInstance().decorate(map, max);
 	
-	return up.getCoords();
+	return [map, up.getCoords()];
 }
 
 RPG.Story.Village.prototype.computeScore = function() {
