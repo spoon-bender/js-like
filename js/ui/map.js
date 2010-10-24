@@ -387,8 +387,8 @@ RPG.UI.ASCIICell.prototype.removeProjectile = function() {
 
 /**
  * @class Canvas-based map
- * @augments RPG.UI.BaseMap
  * FIXME does not handle projectiles correctly.
+ * @augments RPG.UI.BaseMap
  */
 RPG.UI.CanvasMap = OZ.Class().extend(RPG.UI.BaseMap);
 RPG.UI.CanvasMap.prototype.init = function(container) {
