@@ -32,7 +32,7 @@ RPG.Spells.Teleport.name = "teleport";
 RPG.Spells.Teleport.cost = 7;
 RPG.Spells.Teleport.prototype.init = function(caster) {
 	this.parent(caster);
-	this._type = RPG.SPELL_TARGET;
+	this._type = RPG.SPELL_REMOTE;
 }
 
 RPG.Spells.Teleport.prototype.cast = function(coords) {

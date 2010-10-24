@@ -929,7 +929,7 @@ RPG.UI.Command.Cast.prototype.init = function() {
 RPG.UI.Command.Cast.prototype.notify = function(coords) {
 	if (this._spell.getType() == RPG.SPELL_TARGET) {
 		var source = RPG.Game.pc.getCoords();
-		this._spell.showTrajectory(source, coords);
+		this._spell.showTrajectory(source, coords, RPG.Game.pc.getMap());
 	}
 }
 

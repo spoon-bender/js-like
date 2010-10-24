@@ -617,7 +617,7 @@ RPG.Map.prototype.getCoordsInArea = function(center, radius) {
 		
 	}
 	
-	go(center, 0);
+	go.call(this, center, 0);
 	
 	var arr = [];
 	for (var i=0;i<result.length;i++) {

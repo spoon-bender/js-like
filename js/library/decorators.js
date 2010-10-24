@@ -12,7 +12,9 @@ RPG.Decorators.Hidden.prototype.decorate = function(map, percentage) {
 			c.y = j;
 			c.updateID();
 			var cell = map.getCell(c);
-			if (!(cell instanceof RPG.Cells.Corridor)) { continue; }
+			if (!cell) { continue; }
+			
+			if (!cell.blocks(RPG.BLOCKS_LIGHT)) { continue; }
 			if (this._freeNeighbors(map, c) != 2) { continue; }
 			if (Math.random() >= percentage) { continue; }
 			
@@ -72,7 +74,9 @@ RPG.Decorators.Traps.prototype.addTraps = function(map, count) {
 }
 
 /**
- * @class Map decorator
+ * @class Door decorator
+ * - adds doors to surrounding corridors
+ * - transforms walls with adjacent corridors to fake walls
  * @augments RPG.Decorators.BaseDecorator
  */
 RPG.Decorators.Doors = OZ.Singleton().extend(RPG.Decorators.BaseDecorator);
@@ -118,8 +122,7 @@ RPG.Decorators.Doors.prototype.decorate = function(map, room, options) {
 			c.y = j;
 			c.updateID();
 			
-			var feature = map.getFeature(c)
-			var cell = map.getCell(c)
+			var cell = map.getCell(c);
 			if (cell instanceof RPG.Cells.Wall) {
 				/* try fake corridor, if applicable */
 				if (Math.random() >= o.fakeCorridors) { continue; } /* bad luck */
@@ -127,7 +130,7 @@ RPG.Decorators.Doors.prototype.decorate = function(map, room, options) {
 				if (nc != 4) { continue; } /* bad neighbor count */
 				
 				var after = c.clone().plus(dir);
-				if (!map.isValid(after) || !(map.getCell(after) instanceof RPG.Cells.Corridor)) { continue; } /* bad layout */
+				if (map.blocks(RPG.BLOCKS_MOVEMENT, after)) { continue; } /* bad layout */
 				
 				/* fake corridor */
 				var cctor = map.getCellTypes()[0];
@@ -138,6 +141,7 @@ RPG.Decorators.Doors.prototype.decorate = function(map, room, options) {
 				continue;
 			}
 			
+			var feature = map.getFeature(c);
 			if (!feature && o.doors) {
 				/* add door */
 				feature = new RPG.Features.Door();
