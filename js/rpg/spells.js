@@ -142,7 +142,7 @@ RPG.Spells.Projectile.prototype.computeTrajectory = function(source, target, map
 			var coords = prev.neighbor(dir);
 			if (!map.isValid(coords)) { return this._flight; }
 			
-			if (map.visibleThrough(coords) || !this._bounces) {
+			if (!map.blocks(RPG.BLOCKS_LIGHT, coords) || !this._bounces) {
 				/* either free space or non-bouncing end obstacle */
 				this._flight.bounces.push(false);
 				this._flight.coords.push(coords);
@@ -152,7 +152,7 @@ RPG.Spells.Projectile.prototype.computeTrajectory = function(source, target, map
 				if (this._suffixes[dir]) { image += "-" + this._suffixes[dir]; }
 				this._flight.images.push(image);
 				
-				if (!map.visibleThrough(coords)) { break; }
+				if (map.blocks(RPG.BLOCKS_LIGHT, coords)) { break; }
 			} else {
 				/* bounce! */
 				dir = this._computeBounce(prev, dir);
@@ -180,8 +180,8 @@ RPG.Spells.Projectile.prototype._computeBounce = function(coords, dir) {
 	var leftCoords = coords.neighbor(leftDir);
 	var rightCoords = coords.neighbor(rightDir);
 	
-	var leftFree = !leftCoords || map.visibleThrough(leftCoords);
-	var rightFree = !rightCoords || map.visibleThrough(rightCoords);
+	var leftFree = !leftCoords || !map.blocks(RPG.BLOCKS_LIGHT, leftCoords);
+	var rightFree = !rightCoords || !map.blocks(RPG.BLOCKS_LIGHT, rightCoords);
 	
 	if (leftFree == rightFree) { /* backwards */
 		newDir = (dir+4) % 8;

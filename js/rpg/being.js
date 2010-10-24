@@ -124,7 +124,7 @@ RPG.Beings.BaseBeing.prototype.hasSpell = function(spell, castable) {
  * @param {RPG.Misc.Coords} coords
  */
 RPG.Beings.BaseBeing.prototype.setCoords = function(coords) {
-	this._coords = coords;
+	this._coords = coords.clone();
 }
 
 RPG.Beings.BaseBeing.prototype.getCoords = function() {

@@ -123,7 +123,7 @@ RPG.UI.Command.Direction.prototype.exec = function() {
 	}
 	
 	/* can we move there? */
-	if (map.isFree(coords)) {
+	if (!map.blocks(RPG.BLOCKS_MOVEMENT, coords)) {
 		var result = RPG.Game.pc.move(coords);
 		RPG.Game.getEngine().actionResult(result);
 		return;
@@ -494,7 +494,7 @@ RPG.UI.Command.Autowalk.prototype._start = function(dir) {
 	/* cannot walk to the wall */
 	if (dir != RPG.CENTER) {
 		var coords = pc.getCoords().neighbor(dir);
-		if (!map.isFree(coords) ) { return; }
+		if (map.blocks(RPG.BLOCKS_MOVEMENT, coords) ) { return; }
 	}
 
 	this._saveState(dir);
@@ -521,8 +521,8 @@ RPG.UI.Command.Autowalk.prototype._saveState = function(dir) {
 	var rightDir = (dir + 2) % 8;
 	var leftCoords = coords.neighbor(leftDir);
 	var rightCoords = coords.neighbor(rightDir);
-	this._left = leftCoords ? map.isFree(leftCoords) : false;
-	this._right = rightCoords ? map.isFree(rightCoords) : false;
+	this._left = leftCoords ? !map.blocks(RPG.BLOCKS_MOVEMENT, leftCoords) : false;
+	this._right = rightCoords ? !map.blocks(RPG.BLOCKS_MOVEMENT, rightCoords) : false;
 }
 
 RPG.UI.Command.Autowalk.prototype._yourTurn = function() {
@@ -561,9 +561,9 @@ RPG.UI.Command.Autowalk.prototype._check = function() {
 	var rightCoords = coords.neighbor(rightDir);
 	
 	if (!map.isValid(aheadCoords)) { return false; } /* end of map reached */
-	var ahead = map.isFree(aheadCoords);
-	var left = map.isFree(leftCoords);
-	var right = map.isFree(rightCoords);
+	var ahead = !map.blocks(RPG.BLOCKS_MOVEMENT, aheadCoords);
+	var left = !map.blocks(RPG.BLOCKS_MOVEMENT, leftCoords);
+	var right = !map.blocks(RPG.BLOCKS_MOVEMENT, rightCoords);
 	
 	/* leaving opened area/crossroads */
 	if (this._left && !left) { this._left = left; }
@@ -587,7 +587,7 @@ RPG.UI.Command.Autowalk.prototype._check = function() {
 		/* try to change direction, because it is not possible to continue */
 		var freecount = 0;
 		var circle = map.getCoordsInCircle(coords, 1, false);
-		for (var i=0;i<circle.length;i++) { if (map.isFree(circle[i])) { freecount++; } }
+		for (var i=0;i<circle.length;i++) { if (!map.blocks(RPG.BLOCKS_MOVEMENT, circle[i])) { freecount++; } }
 		if (freecount > 2) { return false; } /* too many options to go */
 		
 		if (left && !right) {

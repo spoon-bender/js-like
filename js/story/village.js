@@ -379,7 +379,7 @@ RPG.Quests.ElderEnemy.prototype.getDialogText = function(being) {
 		case RPG.QUEST_NEW: 
 			return [
 				"Welcome, adventurer. You come to our village in desperate times, as we were attacked by some evil being recently. \
-				Even our bravest men failed to defend it!",
+				Even our bravest men failed to defeat it!",
 				"Maybe you would like to help us?"
 			];
 		break;

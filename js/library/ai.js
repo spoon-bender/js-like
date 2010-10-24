@@ -34,7 +34,7 @@ RPG.AI.WanderInArea.prototype.go = function() {
 	var avail = [null];
 	for (var i=0;i<neighbors.length;i++) {
 		var neighbor = neighbors[i];
-		if (!map.isFree(neighbor)) { continue; }
+		if (map.blocks(RPG.BLOCKS_MOVEMENT, neighbor)) { continue; }
 		if (!this._inArea(neighbor)) { continue; }
 		avail.push(neighbor);
 	}
@@ -470,7 +470,7 @@ RPG.AI.Shopkeeper.prototype.init = function(being, shop) {
 			c.x = i;
 			c.y = j;
 			c.updateID();
-			if (!map.isFree(c)) { continue; }
+			if (map.blocks(RPG.BLOCKS_MOVEMENT, c)) { continue; }
 			
 			do {
 				var item = RPG.Factories.items.getInstance(danger);

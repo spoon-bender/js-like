@@ -48,7 +48,7 @@ RPG.Cells.Wall.prototype.init = function() {
 	this._char = "#";
 	this._image = "wall";
 	this._color = "dimgray";
-	this._type = RPG.BLOCKS_LIGHT;
+	this._blocks = RPG.BLOCKS_LIGHT;
 }
 
 /**
@@ -72,7 +72,7 @@ RPG.Features.Tree.prototype.init = function() {
 	this._char = "T";
 	this._color = "green";
 	this._description = "tree";
-	this._type = RPG.BLOCKS_MOVEMENT;
+	this._blocks = RPG.BLOCKS_MOVEMENT;
 }
 
 /**
@@ -98,7 +98,7 @@ RPG.Features.Door.prototype.close = function() {
 	this._closed = true;
 	this._locked = false;
 	
-	this._type = RPG.BLOCKS_LIGHT;
+	this._blocks = RPG.BLOCKS_LIGHT;
 	
 	this._description = "closed door";
 	this._image = "door-closed";
@@ -109,7 +109,7 @@ RPG.Features.Door.prototype.open = function() {
 	this._closed = false;
 	this._locked = false;
 	
-	this._type = RPG.BLOCKS_NOTHING;
+	this._blocks = RPG.BLOCKS_NOTHING;
 	
 	this._description = "open door";
 	this._image = "door-open";
@@ -301,7 +301,7 @@ RPG.Areas.Shop.prototype.setMap = function(map) {
 			c.x = i;
 			c.y = j;
 			c.updateID();
-			if (!this._map.isFree(c)) { continue; }
+			if (this._map.blocks(RPG.BLOCKS_MOVEMENT, c)) { continue; }
 			
 			if (this._door) { throw new Error("Shop cannot have >1 doors"); }
 			this._door = c.clone();

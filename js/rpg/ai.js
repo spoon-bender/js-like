@@ -260,7 +260,7 @@ RPG.AI.coordsToDistance = function(source, target, distance, map) {
 			for (var i=0;i<8;i++) { /* for all neighbors */
 				neighbor = current.neighbor(i);
 				if (!neighbor) { continue; }
-				if (!map.isFree(neighbor)) { continue; }
+				if (map.blocks(RPG.BLOCKS_MOVEMENT, neighbor)) { continue; }
 				if (todo.indexOf(neighbor) != -1) { continue; }
 				
 				neighbor._prev = current; /* so we can trace back the optimal sibling */
@@ -333,7 +333,7 @@ RPG.AI.Wander.prototype.go = function() {
 	var neighbors = map.getCoordsInCircle(coords, 1);
 	var avail = [null];
 	for (var i=0;i<neighbors.length;i++) {
-		if (map.isFree(neighbors[i])) { avail.push(neighbors[i]); }
+		if (!map.blocks(RPG.BLOCKS_MOVEMENT, neighbors[i])) { avail.push(neighbors[i]); }
 	}
 	
 	var target = avail.random();

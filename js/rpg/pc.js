@@ -167,7 +167,7 @@ RPG.Beings.PC.prototype.updateVisibility = function() {
 			c = coords[i];
 
 			var startArc = (i-0.5) * arcsPerCell + 0.5;
-			if (this._visibleCoords(!map.visibleThrough(c), startArc, arcsPerCell, arcs)) { 
+			if (this._visibleCoords(map.blocks(RPG.BLOCKS_LIGHT, c), startArc, arcsPerCell, arcs)) { 
 				this._visibleCoordsHash[c.id] = c; 
 			}
 
@@ -465,7 +465,7 @@ RPG.Beings.PC.prototype.kick = function(coords) {
 		return RPG.ACTION_TIME;
 	}
 
-	if (!this._map.isFree(coords)) {
+	if (this._map.blocks(RPG.BLOCKS_MOVEMENT, coords)) {
 		RPG.UI.buffer.message("Ouch! That hurts!");
 		return RPG.ACTION_TIME;
 	}
@@ -474,7 +474,7 @@ RPG.Beings.PC.prototype.kick = function(coords) {
 		var dir = this._coords.dirTo(coords);
 		var target = coords.neighbor(dir);
 		
-		if (this._map.isFree(target)) { /* kick topmost item */
+		if (!this._map.blocks(RPG.BLOCKS_MOVEMENT, target)) { /* kick topmost item */
 			var item = items[items.length-1];
 			this._map.removeItem(item, coords);
 			this._map.addItem(item, target);

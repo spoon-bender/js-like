@@ -69,7 +69,8 @@ RPG.Game.setMap = function(map, coords) {
 	this._map = map; /* remember where we are */
 
 	RPG.UI.status.updateMap(map.getID()); /* update statusbar */	
-	RPG.UI.map.resize(map.getSize()); /* draw the map */
+	RPG.UI.map.resize(map.getSize()); /* adjust the map */
+	RPG.UI.map.redrawAll(); /* draw from memory */
 
 	map.setBeing(this.pc, coords);
 	var result = this.pc.move(coords); /* move PC to the coords -> redraw visible part */
@@ -176,6 +177,7 @@ RPG.Game._initFactories = function() {
 	RPG.Factories.npcs = new RPG.Misc.Factory().add(RPG.Beings.NPC);
 	RPG.Factories.traps = new RPG.Misc.Factory().add(RPG.Features.Trap);
 	RPG.Factories.spells = new RPG.Misc.Factory().add(RPG.Spells.BaseSpell);
+	RPG.Factories.gold = new RPG.Misc.Factory().add(RPG.Items.Gold);
 
 	RPG.Factories.cells = new RPG.Misc.CellFactory();
 }

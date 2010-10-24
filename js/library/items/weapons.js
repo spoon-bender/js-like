@@ -240,7 +240,7 @@ RPG.Items.Projectile.prototype._done = function() {
 	if (b) {
 		this._owner.attackRanged(b, this);
 	} else {
-		if (map.isFree(coords)) { 
+		if (!map.blocks(RPG.BLOCKS_MOVEMENT, coords)) { 
 			if (RPG.Rules.isProjectileRecovered(this)) {
 				map.addItem(this, coords);
 				var pc = RPG.Game.pc;

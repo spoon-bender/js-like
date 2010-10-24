@@ -9,7 +9,7 @@ RPG.Cells.BaseCell = OZ.Class()
 RPG.Cells.BaseCell.prototype.init = function() {
 	this._initVisuals();
 	this._modifiers = {};
-	this._type = RPG.BLOCKS_NOTHING;
+	this._blocks = RPG.BLOCKS_NOTHING;
 	this._fake = false;
 	this._cell = null;
 	this._feature = null;
@@ -19,8 +19,8 @@ RPG.Cells.BaseCell.prototype.isFake = function() {
 	return this._fake;
 }
 
-RPG.Cells.BaseCell.prototype.getType = function() {
-	return this._type;
+RPG.Cells.BaseCell.prototype.blocks = function(what) {
+	return (this._blocks >= what);
 }
 /**
  * Called by map 
@@ -129,11 +129,11 @@ RPG.Features.BaseFeature.prototype.init = function() {
 	this._map = null;
 	this._initVisuals();
 	this._modifiers = {};
-	this._type = RPG.BLOCKS_NOTHING;
+	this._blocks = RPG.BLOCKS_NOTHING;
 }
 
 RPG.Features.BaseFeature.prototype.setCoords = function(coords) {
-	this._coords = coords;
+	this._coords = coords.clone();
 }
 
 RPG.Features.BaseFeature.prototype.getCoords = function() {
@@ -148,8 +148,8 @@ RPG.Features.BaseFeature.prototype.getMap = function() {
 	return this._map;
 }
 
-RPG.Features.BaseFeature.prototype.getType = function() {
-	return this._type;
+RPG.Features.BaseFeature.prototype.blocks = function(what) {
+	return (this._blocks >= what);
 }
 
 /**
@@ -209,10 +209,9 @@ RPG.Map.prototype.fromIntMap = function(intMap) {
 			coords.y = y;
 			coords.updateID();
             var cell = tmpCells[x][y];
-            var type = cell.getType();
 
 			/* passable section */
-			if (type < RPG.BLOCKS_MOVEMENT) {
+			if (!cell.blocks(RPG.BLOCKS_MOVEMENT)) {
 				this.setCell(cell, coords);
 				continue;
 			}
@@ -228,8 +227,9 @@ RPG.Map.prototype.fromIntMap = function(intMap) {
 				for (var j=minH;j<=maxH;j++) {
 					neighbor.x = i;
 					neighbor.y = j;
+					neighbor.updateID();
 					var neighborCell = tmpCells[i][j];
-					if (neighborCell.getType() < RPG.BLOCKS_MOVEMENT) { ok = true; }
+					if (!neighborCell.blocks(RPG.BLOCKS_MOVEMENT)) { ok = true; }
 				}
 			}
 			
@@ -495,7 +495,7 @@ RPG.Map.prototype.getFreeCoords = function(noItems) {
 			if (!(id in this._cells)) { continue; }
 			if (id in this._features) { continue; }
 			
-			if (!this.isFree(c)) { continue; }
+			if (this.blocks(RPG.BLOCKS_MOVEMENT, c)) { continue; }
 			
 			var items = this._items[id];
 			if (noItems && items && items.length) { continue; }
@@ -611,7 +611,7 @@ RPG.Map.prototype.getCoordsInArea = function(center, radius) {
 		for (var i=0;i<8;i++) {
 			var n = x.neighbor(i);
 			if (!n) { continue; }
-			if (!this.visibleThrough(n)) { continue; }
+			if (this.blocks(RPG.BLOCKS_LIGHT, n)) { continue; }
 			arguments.callee.call(this, n, depth+1);
 		}
 		
@@ -660,7 +660,7 @@ RPG.Map.prototype.getClosestRandomFreeCoords = function(center, radius) {
 
 		for (var j=0;j<candidates.length;j++) {
 			var c = candidates[j];
-			if (this.isFree(c)) { avail.push(c); }
+			if (!this.blocks(RPG.BLOCKS_MOVEMENT, c)) { avail.push(c); }
 		}
 
 		if (avail.length) { coords = avail.random(); }
@@ -691,25 +691,17 @@ RPG.Map.prototype.getCoordsInTwoCorners = function() {
 	return result;
 }
 
-RPG.Map.prototype.isFree = function(coords) {
+RPG.Map.prototype.blocks = function(what, coords) {
 	var id = coords.id;
-	if (this._beings[id]) { return false; }
-	var c = this._cells[id];
-	if (!c) { return false; }
-	
-	if (c.getType() >= RPG.BLOCKS_MOVEMENT) { return false; }
-	if (this._features[id]) { return this._features[id].getType() < RPG.BLOCKS_MOVEMENT; }
-	return true;
-}
 
-RPG.Map.prototype.visibleThrough = function(coords) {
-	var id = coords.id;
 	var c = this._cells[id];
-	if (!c) { return false; }
-	if (c.getType() >= RPG.BLOCKS_LIGHT) { return false; }
-	
-	if (this._features[id]) { return this._features[id].getType() < RPG.BLOCKS_LIGHT; }
-	return true;
+	if (!c) { return true; }
+	if (c.blocks(what)) { return true; }
+
+	if (this._beings[id] && what == RPG.BLOCKS_MOVEMENT) { return true; }
+	if (this._features[id] && this._features[id].blocks(what)) { return true; }
+
+	return false;
 }
 
 RPG.Map.prototype._cellFromNumber = function(celltype) {
@@ -766,7 +758,7 @@ RPG.Decorators.BaseDecorator.prototype._freeNeighbors = function(map, center) {
 	var result = 0;
 	var coords = map.getCoordsInCircle(center, 1, false);
 	for (var i=0;i<coords.length;i++) {
-		if (map.isFree(coords[i])) { result++; }
+		if (!map.blocks(RPG.BLOCKS_MOVEMENT, coords[i])) { result++; }
 	}
 	return result;
 }
@@ -876,6 +868,7 @@ RPG.Generators.BaseGenerator.prototype._freeSpace = function(corner1, corner2) {
 		for (var j=corner1.y; j<=corner2.y; j++) {
 			c.x = i;
 			c.y = j;
+			c.updateID();
 			if (!this._isValid(c)) { return false; }
 			if (!this._bitMap[i][j]) { return false; }
 		}

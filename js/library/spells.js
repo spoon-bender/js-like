@@ -38,7 +38,7 @@ RPG.Spells.Teleport.prototype.init = function(caster) {
 RPG.Spells.Teleport.prototype.cast = function(coords) {
 	var map = this._caster.getMap();
 	
-	if (!map.isFree(coords)) {
+	if (map.blocks(RPG.BLOCKS_MOVEMENT, coords)) {
 		RPG.UI.buffer.message("You cannot teleport to that place.");
 		return;
 	}
@@ -121,7 +121,7 @@ RPG.Spells.MagicBolt.prototype._fly = function(coords) {
 	var b = map.getBeing(coords);
 	if (b) {
 		this._caster.attackMagic(b, this);
-	} else if (!map.visibleThrough(coords)) {
+	} else if (map.blocks(RPG.BLOCKS_LIGHT, coords)) {
 		if (RPG.Game.pc.canSee(coords)) {
 			var s = RPG.Misc.format("%The hits %a and disappears.", this, map.getFeature(coords) || map.getCell(coords));
 			RPG.UI.buffer.message(s);

@@ -174,8 +174,8 @@ RPG.Beings.NPC.prototype._describeLaunch = function(projectile, target) {
 	var verb = (launcher ? "shoots" : "throws");
 	
 	var s = RPG.Misc.format("%A %s %a", this, verb, projectile);
-	if (target.getBeing()) {
-		s += RPG.Misc.format(" at %d", target.getBeing());
+	if (this._map.getBeing(target)) {
+		s += RPG.Misc.format(" at %d", this._map.getBeing(target));
 	}
 	
 	s += ".";

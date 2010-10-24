@@ -176,7 +176,7 @@ RPG.Decorators.Treasure.prototype.decorate = function(map, room, options) {
 	for (var i=c1.x;i<=c2.x;i++) {
 		for (var j=c1.y;j<=c2.y;j++) {
 			var c = new RPG.Misc.Coords(i, j);
-			if (!map.isFree(c)) { continue; }
+			if (map.blocks(RPG.BLOCKS_MOVEMENT, c)) { continue; }
 
 			if (Math.random() < o.treasure) {
 				var treasure = this._generateTreasure(danger);
@@ -190,7 +190,7 @@ RPG.Decorators.Treasure.prototype.decorate = function(map, room, options) {
 }
 RPG.Decorators.Treasure.prototype._generateTreasure = function(danger) {
 	if (Math.randomPercentage() < 67) {
-		return RPG.Items.Gold.factory.method.call(RPG.Items.Gold, danger);
+		return RPG.Factories.gold.getInstance(danger);
 	} else {
 		return RPG.Factories.gems.getInstance(danger);
 	}

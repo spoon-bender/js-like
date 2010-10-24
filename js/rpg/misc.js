@@ -282,7 +282,7 @@ RPG.Misc.IProjectile.prototype.computeTrajectory = function(source, target, map)
 		if (this._suffixes[dir]) { image += "-" + this._suffixes[dir]; }
 		this._flight.images.push(image);
 
-		if (!map.isFree(c)) { break; }
+		if (map.blocks(RPG.BLOCKS_MOVEMENT, c)) { break; }
 	}
 	
 	return this._flight;
