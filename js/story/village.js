@@ -1,10 +1,10 @@
 /**
- * @class Village map
- * @augments RPG.Map
+ * @class Small village map
+ * @augments RPG.Map.Village
  */
-RPG.Map.Village = OZ.Class().extend(RPG.Map);
+RPG.Map.SmallVillage = OZ.Class().extend(RPG.Map.Village);
 
-RPG.Map.Village.prototype.init = function() {
+RPG.Map.SmallVillage.prototype.init = function() {
     var cellmap = [
         [0,0,0,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
         [0,0,0,3,3,3,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -32,14 +32,10 @@ RPG.Map.Village.prototype.init = function() {
 	this._modifiers[RPG.FEAT_SIGHT_RANGE] = 2;
 	this._sound = "tristram";
 	
-    var celltypes = [
-        RPG.Cells.Grass,
-        RPG.Cells.Wall,
-        RPG.Cells.Corridor,
-        RPG.Cells.Water,
-    ];
+    this._cellTypes.push(RPG.Cells.Corridor);
+    this._cellTypes.push(RPG.Cells.Water);
 
-    this.fromIntMap(cellmap.transpose(), celltypes);
+    this.fromIntMap(cellmap.transpose());
 	this.setWelcome("You come to a small peaceful village.");
 
 	this._buildPeople();
@@ -53,34 +49,34 @@ RPG.Map.Village.prototype.init = function() {
 	}
 }
 
-RPG.Map.Village.prototype.entering = function(being) {
+RPG.Map.SmallVillage.prototype.entering = function(being) {
 	this.parent(being);
 	if (being != RPG.Game.pc) { return; }
 
 	RPG.UI.sound.preload("doom");
 }
 
-RPG.Map.Village.prototype.getElder = function() {
+RPG.Map.SmallVillage.prototype.getElder = function() {
 	return this._elder;
 }
 
-RPG.Map.Village.prototype.getSmith = function() {
+RPG.Map.SmallVillage.prototype.getSmith = function() {
 	return this._smith;
 }
 
-RPG.Map.Village.prototype.getHealer = function() {
+RPG.Map.SmallVillage.prototype.getHealer = function() {
 	return this._healer;
 }
 
-RPG.Map.Village.prototype.getWitch = function() {
+RPG.Map.SmallVillage.prototype.getWitch = function() {
 	return this._witch;
 }
 
-RPG.Map.Village.prototype.getShopkeeper = function() {
+RPG.Map.SmallVillage.prototype.getShopkeeper = function() {
 	return this._shopkeeper;
 }
 
-RPG.Map.Village.prototype._buildPeople = function() {
+RPG.Map.SmallVillage.prototype._buildPeople = function() {
     var doors_healer = new RPG.Features.Door();
     var doors_smith = new RPG.Features.Door();
     var doors_shop = new RPG.Features.Door();
@@ -669,7 +665,7 @@ RPG.Story.Village.prototype._firstMap = function() {
 }
 
 RPG.Story.Village.prototype._villageMap = function() {
-	var map = new RPG.Map.Village();
+	var map = new RPG.Map.SmallVillage();
 	var up = map.getFeatures(RPG.Features.Staircase.Up)[0];
 	this._staircases["end"] = up;
 

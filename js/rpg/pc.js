@@ -392,13 +392,11 @@ RPG.Beings.PC.prototype.search = function() {
  */
 RPG.Beings.PC.prototype._search = function(coords) {
 	var cell = this._map.getCell(coords);
-	if (cell instanceof RPG.Cells.Wall.Fake && RPG.Rules.isFakeDetected(this, cell)) {
-		/* reveal! */
-		var realCell = cell.getRealCell();
-		this._map.setCell(realCell, coords);
+	if (cell.isFake() && RPG.Rules.isFakeDetected(this, cell)) {
+		cell.reveal(this._map, coords); /* reveal! */
 
 		var desc = "passage";
-		if (realCell.getFeature()) { desc = realCell.getFeature().describe(); }
+		if (this._map.getFeature(coords)) { desc = this._map.getFeature(coords).describe(); }
 		var s = RPG.Misc.format("You discover a hidden %s!", desc);
 		RPG.UI.buffer.message(s);
 		return 1;

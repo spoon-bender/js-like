@@ -4,12 +4,14 @@
 RPG.Serializer = OZ.Class();
 
 RPG.Serializer.TRANSLATION = {
+	/* FIXME this is no longer important
 	"_coords": "#c",
 	"_description": "#d",
 	"_modifiers": "#m",
 	"_items": "#i",
 	"_feature": "#f",
-	"_being": "#b"
+	"_being": "#b" 
+	*/
 }
 
 RPG.Serializer.prototype.init = function() {
@@ -470,6 +472,7 @@ RPG.Parser.prototype._nameToClass = function(str) {
 var test2 = function() {
 	var s = new RPG.Serializer();
 	s = s.go();
+	window.x = s;
 	var words = s.split(/\W+/);
 	var obj = {};
 	for (var i=0;i<words.length;i++) {

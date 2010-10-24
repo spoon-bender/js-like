@@ -439,6 +439,24 @@ RPG.Misc.Factory.prototype._hasAncestor = function(ctor, ancestor) {
 }
 
 /**
+ * @class
+ */
+RPG.Misc.CellFactory = OZ.Class();
+RPG.Misc.CellFactory.prototype.init = function() {
+	this._instances = [];
+}
+
+RPG.Misc.CellFactory.prototype.get = function(ctor) {
+	for (var i=0;i<this._instances.length;i++) {
+		var inst = this._instances[i];
+		if (inst.constructor == ctor) { return inst; }
+	}
+	var inst = new ctor();
+	this._instances.push(inst);
+	return inst;
+}
+
+/**
  * @class Speed-based scheduler
  */
 RPG.Misc.Scheduler = OZ.Class();

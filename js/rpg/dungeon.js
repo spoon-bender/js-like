@@ -1,5 +1,5 @@
 /**
- * @class Dungeon cell
+ * @class Map cell
  * @augments RPG.Misc.IEnterable
  * @augments RPG.Visual.IVisual
  */
@@ -10,10 +10,33 @@ RPG.Cells.BaseCell.prototype.init = function() {
 	this._initVisuals();
 	this._modifiers = {};
 	this._type = RPG.BLOCKS_NOTHING;
+	this._fake = false;
+	this._cell = null;
+	this._feature = null;
+}
+
+RPG.Cells.BaseCell.prototype.isFake = function() {
+	return this._fake;
 }
 
 RPG.Cells.BaseCell.prototype.getType = function() {
 	return this._type;
+}
+/**
+ * Called by map 
+ */
+RPG.Cells.BaseCell.prototype.hide = function(map, coords) {
+	this._cell = map.getCell(coords);
+	this._feature = map.getFeature(coords);
+	map.setFeature(null, coords);
+}
+
+/**
+ * Not called by map
+ */
+RPG.Cells.BaseCell.prototype.reveal = function(map, coords) {
+	map.setCell(this._cell, coords);
+	map.setFeature(this._feature, coords);
 }
 
 /**
@@ -126,20 +149,6 @@ RPG.Features.BaseFeature.prototype.getType = function() {
 }
 
 /**
- * Can a being move to this feature?
- */
-RPG.Features.BaseFeature.prototype.isFree = function() {
-	return (this._type < RPG.BLOCKS_MOVEMENT);
-}
-
-/**
- * Can a being see through this feature?
- */
-RPG.Features.BaseFeature.prototype.visibleThrough = function() {
-	return (this._type < RPG.BLOCKS_LIGHT);
-}
-
-/**
  * @class Dungeon map
  * @augments RPG.Misc.IEnterable
  */
@@ -152,6 +161,11 @@ RPG.Map.prototype.init = function(id, size, danger) {
 	this._sound = null;
 	this._size = size.clone();
 	this._danger = danger;
+	this._cellTypes = [ /* 0 = default empty, 1 = default full */
+		RPG.Cells.BaseCell,
+		RPG.Cells.BaseCell
+	];
+	
 	
 	this._areas = [];
 	this._areasByCoords = {};
@@ -168,9 +182,8 @@ RPG.Map.prototype.init = function(id, size, danger) {
 /**
  * Populates cells in this map based on an array of arrays of integers.
  * @param {int[][]} intMap
- * @param {RPG.Cells.BaseCell[]} cells Array of used cells
  */
-RPG.Map.prototype.fromIntMap = function(intMap, cells) {
+RPG.Map.prototype.fromIntMap = function(intMap) {
 	var w = intMap.length;
 	var h = intMap[0].length;
 	var tmpCells = [];
@@ -179,7 +192,7 @@ RPG.Map.prototype.fromIntMap = function(intMap, cells) {
 	for (var i=0;i<w;i++) {
 		tmpCells.push([]);
 		for (var j=0;j<h;j++) {
-			var cell = this._cellFromNumber(intMap[i][j], cells);
+			var cell = this._cellFromNumber(intMap[i][j]);
 			tmpCells[i].push(cell);
 		}
 	}
@@ -247,6 +260,13 @@ RPG.Map.prototype.leaving = function(being) {
 	}
 }
 
+/**
+ * Every dungeon provides its default cell types, at least two
+ * @returns {function[]}
+ */
+RPG.Map.prototype.getCellTypes = function() {
+	return this._cellTypes;
+}
 
 RPG.Map.prototype.getID = function() {
 	return this._id;
@@ -403,6 +423,7 @@ RPG.Map.prototype.getCell = function(coords) {
 
 RPG.Map.prototype.setCell = function(cell, coords) {
 	if (cell) {
+		if (cell.isFake()) { cell.hide(this, coords); }
 		this._cells[coords.id] = cell;
 	} else if (this._cells[coords.id]) {
 		delete this._cells[coords.id];
@@ -668,7 +689,7 @@ RPG.Map.prototype.isFree = function(coords) {
 	if (!c) { return false; }
 	
 	if (c.getType() >= RPG.BLOCKS_MOVEMENT) { return false; }
-	if (this._features[id]) { return this._features[id].isFree(); }
+	if (this._features[id]) { return this._features[id].getType() < RPG.BLOCKS_MOVEMENT; }
 	return true;
 }
 
@@ -678,12 +699,12 @@ RPG.Map.prototype.visibleThrough = function(coords) {
 	if (!c) { return false; }
 	if (c.getType() >= RPG.BLOCKS_LIGHT) { return false; }
 	
-	if (this._features[id]) { return this._features[id].visibleThrough(); }
+	if (this._features[id]) { return this._features[id].getType() < RPG.BLOCKS_LIGHT; }
 	return true;
 }
 
-RPG.Map.prototype._cellFromNumber = function(celltype, cells) {
-    return new cells[celltype]();
+RPG.Map.prototype._cellFromNumber = function(celltype) {
+    return RPG.Factories.cells.get(this._cellTypes[celltype]);
 }
 
 /**
@@ -694,6 +715,8 @@ RPG.Map.Dungeon = OZ.Class().extend(RPG.Map);
 
 RPG.Map.Dungeon.prototype.init = function(id, size, danger) {
 	this.parent(id, size, danger);
+	this._cellTypes[0] = RPG.Cells.Corridor;
+	this._cellTypes[1] = RPG.Cells.Wall;
 	this._rooms = [];
 }
 
@@ -706,6 +729,17 @@ RPG.Map.Dungeon.prototype.getRooms = function() {
 	return this._rooms;
 }
 
+/**
+ * @class Village map
+ * @augments RPG.Map
+ */
+RPG.Map.Village = OZ.Class().extend(RPG.Map);
+
+RPG.Map.Village.prototype.init = function(id, size, danger) {
+	this.parent(id, size, danger);
+	this._cellTypes[0] = RPG.Cells.Grass;
+	this._cellTypes[1] = RPG.Cells.Wall;
+}
 
 /**
  * @class Map decorator
@@ -733,9 +767,8 @@ RPG.Decorators.BaseDecorator.prototype._freeNeighbors = function(map, center) {
  */
 RPG.Generators.BaseGenerator = OZ.Class();
 
-RPG.Generators.BaseGenerator.prototype.init = function(size, maptypes) {
+RPG.Generators.BaseGenerator.prototype.init = function(size) {
 	this._size = size;
-	this._maptypes = maptypes || [RPG.Cells.Corridor, RPG.Cells.Wall];
 
 	this._dug = 0;
 	this._bitMap = null;
@@ -749,7 +782,7 @@ RPG.Generators.BaseGenerator.prototype.generate = function(id, danger) {
 
 RPG.Generators.BaseGenerator.prototype._convertToMap = function(id, danger) {
 	var map = new RPG.Map.Dungeon(id, this._size, danger);
-	map.fromIntMap(this._bitMap, this._maptypes);
+	map.fromIntMap(this._bitMap);
 	
 	for (var i=0;i<this._rooms.length;i++) {
 		map.addRoom(this._rooms[i]);

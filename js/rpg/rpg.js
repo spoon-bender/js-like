@@ -58,6 +58,8 @@ RPG.Spells = {};
 /** @namespace */
 RPG.UI = {};
 
+/* Cell and Feature blocking */
+
 /** @constant */
 RPG.BLOCKS_NOTHING		= 0;
 /** @constant */
@@ -65,12 +67,16 @@ RPG.BLOCKS_MOVEMENT	 	= 1; /* can not be moved onto */
 /** @constant */
 RPG.BLOCKS_LIGHT 		= 2; /* can not be seen through, e.g. a wall */
 
+/* Being sexes */
+
 /** @constant */
 RPG.GENDER_MALE			= 0;
 /** @constant */
 RPG.GENDER_FEMALE		= 1;
 /** @constant */
 RPG.GENDER_NEUTER		= 2;
+
+/* UI states */
 
 /** @constant */
 RPG.UI_NORMAL			= 0;
@@ -81,12 +87,16 @@ RPG.UI_WAIT_DIRECTION	= 2;
 /** @constant */
 RPG.UI_WAIT_DIALOG		= 3;
 
+/* AI states */
+
 /** @constant */
 RPG.AI_OK				= 0;
 /** @constant */
 RPG.AI_ALREADY_DONE		= 1;
 /** @constant */
 RPG.AI_IMPOSSIBLE		= 2;
+
+/* Map memory states */
 
 /** @constant */
 RPG.MAP_UNKNOWN			= 0;
@@ -95,12 +105,16 @@ RPG.MAP_VISIBLE			= 1;
 /** @constant */
 RPG.MAP_REMEMBERED		= 2;
 
+/* Being alignments */
+
 /** @constant */
 RPG.ALIGNMENT_CHAOTIC	= 0;
 /** @constant */
 RPG.ALIGNMENT_NEUTRAL	= 1;
 /** @constant */
 RPG.ALIGNMENT_LAWFUL	= 2;
+
+/* Feats */
 
 /** @constant */
 RPG.FEAT_STRENGTH		= 0;
@@ -133,10 +147,14 @@ RPG.FEAT_REGEN_MANA		= 13;
 /** @constant */
 RPG.FEAT_SIGHT_RANGE	= 14;
 
+/* Stats */
+
 /** @constant */
 RPG.STAT_HP				= 0;
 /** @constant */
 RPG.STAT_MANA			= 1;
+
+/* Spell types */
 
 /** @constant */
 RPG.SPELL_SELF			= 0;
@@ -149,6 +167,8 @@ RPG.SPELL_DIRECTION		= 3;
 /** @constant */
 RPG.SPELL_TARGET		= 4;
 
+/* Quest states */
+
 /** @constant */
 RPG.QUEST_NEW			= -1;
 /** @constant */
@@ -159,6 +179,8 @@ RPG.QUEST_GIVEN			= -3;
 RPG.QUEST_DONE			= -4;
 /** @constant */
 RPG.QUEST_REWARDED		= -5;
+
+/* Slots */
 
 /** @constant */
 RPG.SLOT_HEAD			= 0;
@@ -179,6 +201,8 @@ RPG.SLOT_PROJECTILE		= 7;
 /** @constant */
 RPG.SLOT_NECK			= 8;
 
+/* Save/load states */
+
 /** @constant */
 RPG.SAVELOAD_PROCESS	= 0;
 /** @constant */
@@ -186,13 +210,19 @@ RPG.SAVELOAD_DONE		= 1;
 /** @constant */
 RPG.SAVELOAD_FAILURE	= 2;
 
+/* Save load variants */
+
 /** @constant */
 RPG.SAVELOAD_SAVE		= 0;
 /** @constant */
 RPG.SAVELOAD_LOAD		= 1;
 
+/* Attributes (special feats) */
+
 /** @constant */
 RPG.ATTRIBUTES = [RPG.FEAT_STRENGTH, RPG.FEAT_TOUGHNESS, RPG.FEAT_DEXTERITY, RPG.FEAT_MAGIC, RPG.FEAT_LUCK];
+
+/* Directions */
 
 /**
  * Directional constants should not be renumbered. Current numbering offers:
@@ -223,12 +253,16 @@ RPG.CENTER				= 8;
 /** @constant */
 RPG.DIR = {};
 
+/* Action length types */
+
 /** @constant */
 RPG.ACTION_TIME 		= 0;
 /** @constant */
 RPG.ACTION_NO_TIME 		= 1;
 /** @constant */
 RPG.ACTION_DEFER		= 2;
+
+/* Confirmation modes */
 
 /** @constant */
 RPG.CONFIRM_NA			= 0;

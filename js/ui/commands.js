@@ -1123,8 +1123,7 @@ RPG.UI.Command.Launch.prototype.init = function() {
 
 RPG.UI.Command.Launch.prototype.notify = function(coords) {
 	var pc = RPG.Game.pc;
-	var source = RPG.Game.pc.getCoords();
-	pc.getSlot(RPG.SLOT_PROJECTILE).getItem().showTrajectory(source, coords);
+	pc.getSlot(RPG.SLOT_PROJECTILE).getItem().showTrajectory(pc.getCoords(), coords, pc.getMap());
 }
 
 RPG.UI.Command.Launch.prototype.exec = function(coords) {

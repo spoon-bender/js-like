@@ -56,14 +56,9 @@ RPG.Cells.Wall.prototype.init = function() {
  * @augments RPG.Cells.Wall
  */
 RPG.Cells.Wall.Fake = OZ.Class().extend(RPG.Cells.Wall);
-
-RPG.Cells.Wall.Fake.prototype.init = function(cell) {
+RPG.Cells.Wall.Fake.prototype.init = function() {
 	this.parent();
-	this._cell = cell;
-}
-
-RPG.Cells.Wall.Fake.prototype.getRealCell = function() {
-	return this._cell;
+	this._fake = true;
 }
 
 /**

@@ -16,7 +16,7 @@ RPG.Decorators.Hidden.prototype.decorate = function(map, percentage) {
 			if (this._freeNeighbors(map, c) != 2) { continue; }
 			if (Math.random() >= percentage) { continue; }
 			
-			var fake = new RPG.Cells.Wall.Fake(cell);
+			var fake = new RPG.Cells.Wall.Fake();
 			map.setCell(fake, c);
 		}
 	}
@@ -76,7 +76,6 @@ RPG.Decorators.Traps.prototype.addTraps = function(map, count) {
 RPG.Decorators.Doors = OZ.Singleton().extend(RPG.Decorators.BaseDecorator);
 RPG.Decorators.Doors.prototype.decorate = function(map, room, options) {
 	var o = {
-		corridor: RPG.Cells.Corridor,
 		doors: true,
 		closed: 0.5,
 		locked: 0.05,
@@ -129,8 +128,11 @@ RPG.Decorators.Doors.prototype.decorate = function(map, room, options) {
 				if (!map.isValid(after) || !(map.getCell(after) instanceof RPG.Cells.Corridor)) { continue; } /* bad layout */
 				
 				/* fake corridor */
-				var fake = new RPG.Cells.Wall.Fake(new o.corridor());
-				map.setCell(c, fake);
+				var cctor = map.getCellTypes[0];
+				var corridor = RPG.Misc.Factories.cells.get(cctor);
+				map.setCell(corridor, c);
+				var fake = new RPG.Cells.Wall.Fake();
+				map.setCell(fake, c);
 				continue;
 			}
 			
@@ -146,8 +148,8 @@ RPG.Decorators.Doors.prototype.decorate = function(map, room, options) {
 
 			/* fake wall */
 			if (Math.random() < o.fakeDoors) {
-				var fake = new RPG.Cells.Wall.Fake(cell);
-				map.setCell(c, fake);
+				var fake = new RPG.Cells.Wall.Fake();
+				map.setCell(fake, c);
 			} /* if fake */
 
 		} /* for y */

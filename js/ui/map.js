@@ -148,7 +148,7 @@ RPG.UI.BaseCell.prototype.init = function(owner, coords) {
 
 /**
  * Update cell contents
- * @param {object} memory Map memory
+ * @param {object || null} memory Map memory
  */
 RPG.UI.BaseCell.prototype.update = function(memory) {
 }
@@ -222,11 +222,10 @@ RPG.UI.ImageCell.prototype.init = function(owner, coords) {
  * @see RPG.UI.BaseCell#update
  */
 RPG.UI.ImageCell.prototype.update = function(memory) {
-	this._dom.container.style.opacity = (memory.state == RPG.MAP_REMEMBERED ? 0.5 : 1);
-	var data = memory.data;
+	this._dom.container.style.opacity = (memory && memory.state == RPG.MAP_REMEMBERED ? 0.5 : 1);
 
 	for (var i=0;i<this._dom.nodes.length;i++) {
-		var what = (data.length > i ? data[i] : null);
+		var what = (memory && memory.data.length > i ? memory.data[i] : null);
 		this._updateImage(this._dom.nodes[i], what);
 		if (i == 1) { this._topLayer = what; }
 	}
@@ -339,10 +338,9 @@ RPG.UI.ASCIICell.prototype.init = function(owner, coords) {
  * @see RPG.UI.BaseCell#update
  */
 RPG.UI.ASCIICell.prototype.update = function(memory) {
-	this._dom.node.style.opacity = (memory.state == RPG.MAP_REMEMBERED ? 0.5 : 1);
-	var data = memory.data;
+	this._dom.node.style.opacity = (memory && memory.state == RPG.MAP_REMEMBERED ? 0.5 : 1);
 	
-	var item = (data.length ? data[data.length-1] : null);
+	var item = (memory && memory.data.length ? memory.data[memory.data.length-1] : null);
 	if (!item) {
 		this._dom.node.innerHTML = "&nbsp;";
 		this._dom.node.style.color = "white";
@@ -389,6 +387,7 @@ RPG.UI.ASCIICell.prototype.removeProjectile = function() {
 /**
  * @class Canvas-based map
  * @augments RPG.UI.BaseMap
+ * FIXME does not handle projectiles correctly.
  */
 RPG.UI.CanvasMap = OZ.Class().extend(RPG.UI.BaseMap);
 RPG.UI.CanvasMap.prototype.init = function(container) {
