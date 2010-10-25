@@ -99,7 +99,7 @@ RPG.UI.Command.Direction.prototype.exec = function() {
 	var map = pc.getMap();
 	
 	/* invalid move */
-	if (!map.isValid(coords)) { 
+	if (!map.getCell(coords)) { 
 		RPG.UI.buffer.message("You cannot move there!");
 		return; 
 	} 
@@ -560,7 +560,7 @@ RPG.UI.Command.Autowalk.prototype._check = function() {
 	var leftCoords = coords.neighbor(leftDir);
 	var rightCoords = coords.neighbor(rightDir);
 	
-	if (!map.isValid(aheadCoords)) { return false; } /* end of map reached */
+	if (!map.getCell(aheadCoords)) { return false; } /* end of map reached */
 	var ahead = !map.blocks(RPG.BLOCKS_MOVEMENT, aheadCoords);
 	var left = !map.blocks(RPG.BLOCKS_MOVEMENT, leftCoords);
 	var right = !map.blocks(RPG.BLOCKS_MOVEMENT, rightCoords);

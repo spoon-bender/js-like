@@ -140,7 +140,7 @@ RPG.Spells.Projectile.prototype.computeTrajectory = function(source, target, map
 			dist++;
 			var prev = (this._flight.coords.length ? this._flight.coords[this._flight.coords.length-1] : source);
 			var coords = prev.neighbor(dir);
-			if (!map.isValid(coords)) { return this._flight; }
+			if (!map.getCell(coords)) { return this._flight; }
 			
 			if (!map.blocks(RPG.BLOCKS_LIGHT, coords) || !this._bounces) {
 				/* either free space or non-bouncing end obstacle */
