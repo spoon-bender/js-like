@@ -169,10 +169,11 @@ RPG.Beings.VillageHealer.prototype.init = function() {
 	this.setFeat(RPG.FEAT_PV, 10);
 	this.setFeat(RPG.FEAT_MAX_HP, 20);
 	
-	this._description = "village healer";
-	this._char = "@";
-	this._color = "red";
-	this._image = "village-healer";
+	this.setVisual({
+		desc: "village healer",
+		color: "red",
+		image: "village-healer"
+	});
 
 	this.fullStats();
 }
@@ -195,10 +196,12 @@ RPG.Beings.VillageShopkeeper.prototype.init = function() {
 	this.setFeat(RPG.FEAT_STRENGTH, 20);
 	this.setFeat(RPG.FEAT_TOUGHNESS, 20);
 	
-	this._description = "shopkeeper";
-	this._char = "@";
-	this._color = "red";
-	this._image = "village-shopkeeper";
+	this.setVisual({
+		desc: "shopkeeper",
+		color: "red",
+		image: "village-shopkeeper"
+	});
+
 	this.fullStats();
 }
 
@@ -221,10 +224,11 @@ RPG.Beings.VillageWitch.prototype.init = function() {
 	this.addItem(broom);
 	this.equip(RPG.SLOT_WEAPON, broom);
 	
-	this._description = "witch";
-	this._char = "@";
-	this._color = "blue";
-	this._image = "village-witch";
+	this.setVisual({
+		desc: "witch",
+		color: "blue",
+		image: "village-witch"
+	});
 
 	this.addSpell(RPG.Spells.MagicBolt);
 	this.addSpell(RPG.Spells.Teleport);
@@ -263,10 +267,11 @@ RPG.Beings.VillageGuard.prototype.init = function() {
     var armor = new RPG.Items.ChainMail();
     this.equip(RPG.SLOT_ARMOR,armor);
 	
-	this._description = "elder's guard";
-	this._char = "@";
-	this._color = "red";
-	this._image = "village-guard";
+	this.setVisual({
+		desc: "elder's guard",
+		color: "red",
+		image: "village-guard"
+	});
 	
 	this._ai.setDialogText("Hey there! Friend or foe?");
 
@@ -296,10 +301,12 @@ RPG.Beings.VillageSmith.prototype.init = function() {
 	var hammer = new RPG.Items.Hammer();
 	this.equip(RPG.SLOT_WEAPON, hammer);
 	
-	this._description = "dwarven smith";
-	this._char = "h";
-	this._color = "darkgray";
-	this._image = "village-smith";
+	this.setVisual({
+		desc: "dwarven smith",
+		color: "darkgray",
+		ch: "h",
+		image: "village-smith"
+	});
 	
 	this._ai.setDialogText("Aye! Need some steel?");
 	this.fullStats();
@@ -328,10 +335,11 @@ RPG.Beings.VillageElder.prototype.init = function() {
 	var sword = new RPG.Items.LongSword();
 	this.equip(RPG.SLOT_WEAPON, sword);
 	
-	this._description = "village elder";
-	this._char = "@";
-	this._color = "brown";
-	this._image = "village-elder";
+	this.setVisual({
+		desc: "village elder",
+		color: "brown",
+		image: "village-elder"
+	});
 	
 	this.fullStats();
 }
@@ -344,9 +352,11 @@ RPG.Items.WeddingNecklace = OZ.Class().extend(RPG.Items.Necklace);
 RPG.Items.WeddingNecklace.factory.ignore = true;
 RPG.Items.WeddingNecklace.prototype.init = function() {
 	this.parent();
-	this._image = "wedding-necklace"; /* FIXME */
-	this._color = "gold";
-	this._description = "wedding necklace";
+	this.setVisual({
+		desc: "wedding necklace",
+		color: "gold",
+		image: "wedding-necklace" /* FIXME */
+	});
 }
 
 /**

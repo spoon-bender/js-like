@@ -7,7 +7,7 @@ RPG.Cells.BaseCell = OZ.Class()
 						.implement(RPG.Visual.IVisual)
 						.implement(RPG.Misc.IEnterable);
 RPG.Cells.BaseCell.prototype.init = function() {
-	this._initVisuals();
+	this.setVisual({});
 	this._modifiers = {};
 	this._blocks = RPG.BLOCKS_NOTHING;
 	this._fake = false;
@@ -125,9 +125,9 @@ RPG.Features.BaseFeature = OZ.Class()
 							.implement(RPG.Visual.IVisual)
 							.implement(RPG.Misc.IEnterable);
 RPG.Features.BaseFeature.prototype.init = function() {
+	this.setVisual({});
 	this._coords = null;
 	this._map = null;
-	this._initVisuals();
 	this._modifiers = {};
 	this._blocks = RPG.BLOCKS_NOTHING;
 }
@@ -324,11 +324,9 @@ RPG.Map.prototype._setMemory = function(state, id) {
 		m.data.push(this._features[id]);
 	}
 	
-	/* remembered stack uses clones */
-	if (state == RPG.MAP_REMEMBERED) {
-		for (var i=0;i<m.data.length;i++) {
-			m.data[i] = new RPG.Visual.Trace(m.data[i]);
-		}
+	/* convert to visuals */
+	for (var i=0;i<m.data.length;i++) {
+		m.data[i] = m.data[i].getVisual();
 	}
 }
 

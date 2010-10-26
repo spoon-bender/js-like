@@ -86,7 +86,7 @@ RPG.Spells.MagicExplosion.prototype.init = function(caster) {
 	this._radius = 2;
 
 	this._explosionImage = "magic-explosion";
-	this._color = "yellow";
+	this.setVisual({color:"yellow"});
 }
 
 RPG.Spells.MagicExplosion.prototype.getRadius = function() {
@@ -111,7 +111,7 @@ RPG.Spells.MagicBolt.prototype.init = function(caster) {
 	this._range = 5;
 
 	this._baseImage = "magic-bolt";
-	this._color = "blueviolet";
+	this.setVisual({color:"blueviolet"});
 }
 
 RPG.Spells.MagicBolt.prototype._fly = function(coords) {
@@ -145,7 +145,7 @@ RPG.Spells.Fireball.prototype.init = function(caster) {
 	
 	this._explosionImage = "fireball-explosion";
 	this._baseImage = "fireball";
-	this._color = "red"; 
+	this.setVisual({color:"red"});
 }
 
 RPG.Spells.Fireball.prototype._fly = function(coords) {

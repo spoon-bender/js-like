@@ -6,11 +6,12 @@ RPG.Beings.PC = OZ.Class().extend(RPG.Beings.BaseBeing);
 RPG.Beings.PC.prototype.init = function(race, profession) {
 	this.parent(race);
 	var prof = new profession();
-	this._image += "-" + prof.getImage();
+	
+	this.setVisual({image:this._visual.image + "-" + prof.getImage()});
 	
 	this._visibleCoordsHash = {};
 	
-	this._description = "you";
+	this.setVisual({desc:"you"});
 	this._kills = 0;
 	this._quests = [];
 	

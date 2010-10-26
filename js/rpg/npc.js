@@ -83,7 +83,7 @@ RPG.Beings.NPC.prototype.confirmAttack = function() {
  * @see RPG.Visual.IVisual#describe
  */
 RPG.Beings.NPC.prototype.describe = function() {
-	var s = this._description;
+	var s = this._visual.desc;
 	if (this._gender == RPG.GENDER_FEMALE) { s = "female "+s; }
 	if (this._name) { s = this._name + " the " + s.capitalize(); }
 	return s;
@@ -208,3 +208,4 @@ RPG.Beings.NPC.prototype._describeAttack = function(hit, damage, kill, being, sl
 	
 	RPG.UI.buffer.message(s);
 }
+

@@ -7,8 +7,6 @@ RPG.Beings.BaseBeing = OZ.Class()
 						.implement(RPG.Visual.IVisual)
 						.implement(RPG.Misc.IActor);
 RPG.Beings.BaseBeing.prototype.init = function(race) {
-	this._initVisuals();
-
 	this._name = "";
 	this._slots = {};
 	this._coords = null;
@@ -47,10 +45,8 @@ RPG.Beings.BaseBeing.prototype.knowsFeature = function(feature) {
  * Prepare the being-race binding
  */
 RPG.Beings.BaseBeing.prototype._setRace = function(race) {
-	/* inherit color+char+image from race */
-	this._color = race.getColor();
-	this._char = race.getChar();
-	this._image = race.getImage();
+	/* inherit visuals from race */
+	this.setVisual(race.getVisual());
 	
 	/* bind all slots to a particular being */
 	this._slots = race.getSlots();

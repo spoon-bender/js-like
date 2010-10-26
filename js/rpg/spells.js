@@ -10,7 +10,7 @@ RPG.Spells.BaseSpell.name = "";
 RPG.Spells.BaseSpell.damage = null;
 
 RPG.Spells.BaseSpell.prototype.init = function(caster) {
-	this._initVisuals();
+	this.setVisual({});
 	
 	this._type = RPG.SPELL_SELF;
 	this._caster = caster;
@@ -57,8 +57,7 @@ RPG.Spells.Attack.prototype.init = function(caster) {
  * @param {bool} ignoreCenter
  */
 RPG.Spells.Attack.prototype.explode = function(center, radius, ignoreCenter) {
-	this._image = this._explosionImage;
-	this._char = "*";
+	this.setVisual({ch:"*", image:this._explosionImage});
 
 	RPG.UI.map.removeProjectiles();
 	RPG.Game.getEngine().lock();
@@ -200,3 +199,7 @@ RPG.Spells.Projectile.prototype._computeBounce = function(coords, dir) {
 	
 	return newDir;
 }
+
+/* FIXME */
+RPG.Misc.IProjectile.mark = new RPG.Misc.IProjectile.Mark();
+RPG.Misc.IProjectile.endMark = new RPG.Misc.IProjectile.EndMark();

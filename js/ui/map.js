@@ -251,33 +251,9 @@ RPG.UI.ImageCell.prototype._updateImage = function(node, what) {
 	}
 	
 	node.style.visibility = "visible";
-	var src = what.getImage();
-	var text = what.describe();
-	var type = "";
+	var url = "img/" + what.imagePrefix + "/" + what.image + ".png";
+	var text = what.desc;
 	
-	if (what instanceof RPG.Visual.Trace) {
-		var f = function(){};
-		f.prototype = what.getClass().prototype;
-		what = new f();
-	}
-
-	if (what instanceof RPG.Beings.PC) {
-		type = "pc";
-	} else if (what instanceof RPG.Beings.NPC) {
-		type = "beings";
-	} else if (what instanceof RPG.Items.BaseItem) {
-		type = "items";
-	} else if (what instanceof RPG.Cells.BaseCell) {
-		type = "cells";
-	} else if (what instanceof RPG.Spells.BaseSpell) {
-		type = "spells";
-	} else if (what instanceof RPG.Features.BaseFeature) {
-		type = "features";
-	} else {
-		type = "misc";
-	}
-	
-	var url = "img/"+type+"/"+src+".png";
 	if (node.src.indexOf(url) == -1) { 
 		node.src = url; 
 	}
@@ -350,11 +326,11 @@ RPG.UI.ASCIICell.prototype.update = function(memory) {
 		return;
 	}
 
-	var ch = item.getChar();
+	var ch = item.ch;
 	if (ch in this.entities) { ch = this.entities[ch]; }
 
-	var color = item.getColor();
-	var title = item.describe();
+	var color = item.color;
+	var title = item.desc;
 	
 	this._dom.node.title = title;
 	if (ch != this._currentChar) {
@@ -376,8 +352,8 @@ RPG.UI.ASCIICell.prototype.removeFocus = function() {
 }
 
 RPG.UI.ASCIICell.prototype.addProjectile = function(projectile) {
-	this._dom.node.innerHTML = projectile.getChar();
-	this._dom.node.style.color = projectile.getColor();
+	this._dom.node.innerHTML = projectile.getVisual().ch;
+	this._dom.node.style.color = projectile.getVisual().color;
 }
 
 RPG.UI.ASCIICell.prototype.removeProjectile = function() {
@@ -426,7 +402,7 @@ RPG.UI.CanvasMap.prototype.resize = function(size) {
 
 RPG.UI.CanvasMap.prototype.addProjectile = function(coords, projectile) {
 	this._projectiles.push(coords.clone());
-	this._redrawCoords(coords, projectile);
+	this._redrawCoords(coords, projectile.getVisual());
 }
 
 RPG.UI.CanvasMap.prototype.removeProjectiles = function() {
@@ -466,8 +442,8 @@ RPG.UI.CanvasMap.prototype._redrawCoords = function(coords, what) {
 	}
 	
 	if (todo) {
-		var ch = todo.getChar();
-		var color = todo.getColor();
+		var ch = todo.ch;
+		var color = todo.color;
 		this._ctx.fillStyle = color;
 		this._ctx.fillText(ch, x, y + this._charHeight);
 		this._ctx.globalAlpha = 1;

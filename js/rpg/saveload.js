@@ -35,13 +35,13 @@ RPG.Serializer.prototype.go = function() {
 	
 	this._stacks.push(new RPG.Serializer.Stack(this, RPG.Beings.BaseBeing));
 	this._stacks.push(new RPG.Serializer.Stack(this, RPG.Items.BaseItem));
-	this._stacks.push(new RPG.Serializer.Stack(this, RPG.Cells.BaseCell));
+	this._stacks.push(new RPG.Serializer.Stack(this, RPG.Visual));
 	this._stacks.push(new RPG.Serializer.Stack(this, RPG.Map));
 	this._stacks.push(new RPG.Serializer.Stack(this));
 
 	var result = {};
 	result.classes = classNames;
-	result.game = RPG.Game.toJSON(this);
+	result.game = this.toJSON(RPG.Game);
 	
 	do {
 		var ok = true;
@@ -60,6 +60,7 @@ RPG.Serializer.prototype.go = function() {
 	}
 
 	this._stacks = [];
+	window.x = result;
 	return JSON.stringify(result/*, null, "  "*/);
 }
 
@@ -71,27 +72,23 @@ RPG.Serializer.prototype.classIndex = function(what) {
 }
 
 /**
- * Called from an instance that wants a specific serialization
+ * Generic serializer
  */
 RPG.Serializer.prototype.toJSON = function(what, options) {
-	return this._serializeObject(what, options);
+	return this._valueToJSON(what, false, options);
 }
 
 /**
  * Convert instance to JSON representation
  */
 RPG.Serializer.prototype.finalizeInstance = function(instance) {
-	if (instance.toJSON) {
-		return instance.toJSON(this);
-	} else {
-		return this.toJSON(instance);
-	}
+	return this._objectToJSON(instance);
 }
 
 /**
- * Serialize instance by adding it to stack and returning a placeholder
+ * Defer instance serialization by adding it to stack and returning a placeholder
  */
-RPG.Serializer.prototype._serializeInstance = function(what) {
+RPG.Serializer.prototype._deferInstance = function(what) {
 	for (var i=0;i<this._stacks.length;i++) {
 		var stack = this._stacks[i];
 		if (stack.accepts(what)) { return stack.add(what); }
@@ -102,13 +99,15 @@ RPG.Serializer.prototype._serializeInstance = function(what) {
 }
 
 /**
- * Serialize a class by converting it to string with index
+ * JSONify a class by converting it to string with index
  */
-RPG.Serializer.prototype._serializeClass = function(cl) {
+RPG.Serializer.prototype._classToJSON = function(cl) {
 	return "#c"+this.classIndex(cl);
 }
 
-RPG.Serializer.prototype._serializeObject = function(obj, options) {
+RPG.Serializer.prototype._objectToJSON = function(obj, options) {
+	if (obj.toJSON && !options) { return obj.toJSON(this); }
+
 /*
 	var index = this._cache.indexOf(obj);
 	if (index == -1) {
@@ -145,8 +144,8 @@ RPG.Serializer.prototype._serializeObject = function(obj, options) {
 	
 		/* forward prop translation */
 		if (p in RPG.Serializer.TRANSLATION) { p = RPG.Serializer.TRANSLATION[p]; }
-
-		result[p] = this._serializeValue(value);
+		
+		result[p] = this._valueToJSON(value, true);
 	}
 	
 	if (options && options.include) {
@@ -156,14 +155,17 @@ RPG.Serializer.prototype._serializeObject = function(obj, options) {
 			/* forward prop translation */
 			if (p in RPG.Serializer.TRANSLATION) { p = RPG.Serializer.TRANSLATION[p]; }
 
-			result[p] = this._serializeValue(value);
+			result[p] = this._valueToJSON(value, true);
 		}
 	}
 	
 	return result;
 }
 
-RPG.Serializer.prototype._serializeValue = function(value) {
+/**
+ * Convert generic JS value to JSON
+ */
+RPG.Serializer.prototype._valueToJSON = function(value, deferInstances, options) {
 	if (value === null) { return value; }
 	switch (typeof(value)) {
 		case "number":
@@ -174,24 +176,23 @@ RPG.Serializer.prototype._serializeValue = function(value) {
 		break;
 		
 		case "function":
-			return this._serializeClass(value);
+			return this._classToJSON(value);
 		break;
 	}
 	
 	if (value instanceof Array) { /* regular array */
 		var arr = [];
 		for (var i=0;i<value.length;i++) {
-			arr.push(this._serializeValue(value[i]));
+			arr.push(this._valueToJSON(value[i], true)); /* recurse */
 		}
 		return arr;
 	}
 	
-	if (value.constructor.extend) { /* instance */
-		return this._serializeInstance(value);
-	}
+
+	if (value.constructor.extend && deferInstances) { return this._deferInstance(value); }
 	
 	/* object */
-	return this._serializeObject(value);
+	return this._objectToJSON(value, options);
 }
 
 /**

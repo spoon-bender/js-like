@@ -146,12 +146,10 @@ RPG.Misc.IWeapon.prototype.getDamage = function() {
 
 /**
  * @class Interface for flying objects
- * @augments RPG.Visual.IVisual
  * @augments RPG.Misc.IWeapon
  */
 RPG.Misc.IProjectile = OZ.Class()
-						.implement(RPG.Misc.IWeapon)
-						.implement(RPG.Visual.IVisual);
+						.implement(RPG.Misc.IWeapon);
 
 RPG.Misc.IProjectile.prototype._initProjectile = function() {
 	this._range = 5;
@@ -245,8 +243,7 @@ RPG.Misc.IProjectile.prototype._step = function() {
 		return;
 	}
 	
-	this._char = this._flight.chars[index];
-	this._image = this._flight.images[index];
+	this.setVisual({ch:this._flight.chars[index], image:this._flight.images[index]});
 	this._fly(this._flight.coords[index]);
 }
 
@@ -294,9 +291,7 @@ RPG.Misc.IProjectile.prototype.computeTrajectory = function(source, target, map)
  */
 RPG.Misc.IProjectile.Mark = OZ.Class().implement(RPG.Visual.IVisual);
 RPG.Misc.IProjectile.Mark.prototype.init = function() {
-	this._char = "*";
-	this._color = "white";
-	this._image = "crosshair";
+	this.setVisual({ch:"*", color:"white", image:"crosshair"});
 }
 
 /**
@@ -305,13 +300,8 @@ RPG.Misc.IProjectile.Mark.prototype.init = function() {
  */
 RPG.Misc.IProjectile.EndMark = OZ.Class().implement(RPG.Visual.IVisual);
 RPG.Misc.IProjectile.EndMark.prototype.init = function() {
-	this._char = "X";
-	this._color = "white";
-	this._image = "crosshair-end";
+	this.setVisual({ch:"X", color:"white", image:"crosshair-end"});
 }
-
-RPG.Misc.IProjectile.mark = new RPG.Misc.IProjectile.Mark();
-RPG.Misc.IProjectile.endMark = new RPG.Misc.IProjectile.EndMark();
 
 /**
  * @class Actor interface

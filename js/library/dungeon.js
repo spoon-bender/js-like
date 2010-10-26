@@ -5,10 +5,12 @@
 RPG.Cells.Corridor = OZ.Class().extend(RPG.Cells.BaseCell);
 RPG.Cells.Corridor.prototype.init = function() {
 	this.parent();
-	this._description = "floor section";
-	this._char = ".";
-	this._image = "corridor";
-	this._color = "silver";
+	this.setVisual({
+		desc: "floor section",
+		ch: ".",
+		image: "corridor",
+		color: "silver"
+	});
 }
 
 /**
@@ -18,10 +20,12 @@ RPG.Cells.Corridor.prototype.init = function() {
 RPG.Cells.Grass = OZ.Class().extend(RPG.Cells.BaseCell);
 RPG.Cells.Grass.prototype.init = function() {
 	this.parent();
-	this._description = "grass";
-	this._char = ".";
-	this._image = "grass";
-	this._color = "OliveDrab";
+	this.setVisual({
+		desc: "grass",
+		ch: ".",
+		image: "grass",
+		color: "OliveDrab"
+	});
 }
 
 /**
@@ -31,10 +35,12 @@ RPG.Cells.Grass.prototype.init = function() {
 RPG.Cells.Water = OZ.Class().extend(RPG.Cells.BaseCell);
 RPG.Cells.Water.prototype.init = function() {
 	this.parent();
-	this._description = "water";
-	this._char = "=";
-	this._image = "water";
-	this._color = "darkblue";
+	this.setVisual({
+		desc: "water",
+		ch: "=",
+		image: "water",
+		color: "darkblue"
+	});
 }
 
 /**
@@ -44,10 +50,12 @@ RPG.Cells.Water.prototype.init = function() {
 RPG.Cells.Wall = OZ.Class().extend(RPG.Cells.BaseCell);
 RPG.Cells.Wall.prototype.init = function() {
 	this.parent();
-	this._description = "solid wall";
-	this._char = "#";
-	this._image = "wall";
-	this._color = "dimgray";
+	this.setVisual({
+		desc: "solid wall",
+		ch: "#",
+		image: "wall",
+		color: "dimgray"
+	});
 	this._blocks = RPG.BLOCKS_LIGHT;
 }
 
@@ -68,10 +76,12 @@ RPG.Cells.Wall.Fake.prototype.init = function() {
 RPG.Features.Tree = OZ.Class().extend(RPG.Features.BaseFeature);
 RPG.Features.Tree.prototype.init = function() {
 	this.parent();
-	this._image = "tree";
-	this._char = "T";
-	this._color = "green";
-	this._description = "tree";
+	this.setVisual({
+		desc: "tree",
+		ch: "T",
+		image: "tree",
+		color: "green"
+	});
 	this._blocks = RPG.BLOCKS_MOVEMENT;
 }
 
@@ -85,7 +95,7 @@ RPG.Features.Door.prototype.init = function() {
 	this._hp = 4;
 	this._closed = null;
 	this._locked = null;
-	this._color = "sienna";
+	this.setVisual({color:"sienna"});
 	this.open();
 }
 
@@ -100,9 +110,11 @@ RPG.Features.Door.prototype.close = function() {
 	
 	this._blocks = RPG.BLOCKS_LIGHT;
 	
-	this._description = "closed door";
-	this._image = "door-closed";
-	this._char = "+";
+	this.setVisual({
+		desc: "closed door",
+		image: "door-closed",
+		ch: "+"
+	});
 }
 
 RPG.Features.Door.prototype.open = function() {
@@ -111,9 +123,11 @@ RPG.Features.Door.prototype.open = function() {
 	
 	this._blocks = RPG.BLOCKS_NOTHING;
 	
-	this._description = "open door";
-	this._image = "door-open";
-	this._char = "/";
+	this.setVisual({
+		desc: "open door",
+		image: "door-open",
+		ch: "/"
+	});
 }
 
 RPG.Features.Door.prototype.unlock = function() {
@@ -147,7 +161,7 @@ RPG.Features.Trap = OZ.Class().extend(RPG.Features.BaseFeature);
 RPG.Features.Trap.factory.ignore = true;
 RPG.Features.Trap.prototype.init = function() {
 	this.parent();
-	this._char = "^";
+	this.setVisual({ch:"^"});
 	this._damage = null;
 }
 
@@ -171,10 +185,11 @@ RPG.Features.Trap.Teleport = OZ.Class().extend(RPG.Features.Trap);
 
 RPG.Features.Trap.Teleport.prototype.init = function() {
 	this.parent();
-	
-	this._color = "limegreen";
-	this._image = "trap-teleport";
-	this._description = "teleport trap";
+	this.setVisual({
+		desc: "teleport trap",
+		image: "trap-teleport",
+		color: "limegreen"
+	});
 }
 
 RPG.Features.Trap.Teleport.prototype.setOff = function(e) {
@@ -193,10 +208,11 @@ RPG.Features.Trap.Pit.prototype.init = function() {
 	this.parent();
 	
 	this._damage = new RPG.Misc.RandomValue(3, 1);
-
-	this._color = "sienna";
-	this._image = "trap-pit";
-	this._description = "pit trap";
+	this.setVisual({
+		desc: "pit trap",
+		image: "trap-pit",
+		color: "sienna"
+	});
 }
 
 RPG.Features.Trap.Pit.prototype.setOff = function() {
@@ -227,7 +243,7 @@ RPG.Features.Staircase = OZ.Class().extend(RPG.Features.BaseFeature);
 
 RPG.Features.Staircase.prototype.init = function() {
 	this.parent();
-	this._color = "silver";
+	this.setVisual({color:"silver"});
 	this._target = null;
 }
 
@@ -263,9 +279,11 @@ RPG.Features.Staircase.prototype.getTarget = function() {
 RPG.Features.Staircase.Down = OZ.Class().extend(RPG.Features.Staircase);
 RPG.Features.Staircase.Down.prototype.init = function() {
 	this.parent();
-	this._char = ">";
-	this._description = "staircase leading down";
-	this._image = "staircase-down";
+	this.setVisual({
+		desc: "staircase leading down",
+		image: "staircase-down",
+		ch: ">"
+	});
 }
 
 /**
@@ -275,9 +293,11 @@ RPG.Features.Staircase.Down.prototype.init = function() {
 RPG.Features.Staircase.Up = OZ.Class().extend(RPG.Features.Staircase);
 RPG.Features.Staircase.Up.prototype.init = function() {
 	this.parent();
-	this._char = "<";
-	this._description = "staircase leading up";
-	this._image = "staircase-up";
+	this.setVisual({
+		desc: "staircase leading up",
+		image: "staircase-up",
+		ch: "<"
+	});
 }
 
 /**
