@@ -3,17 +3,6 @@
  */
 RPG.Serializer = OZ.Class();
 
-RPG.Serializer.TRANSLATION = {
-	/* FIXME this is no longer important
-	"_coords": "#c",
-	"_description": "#d",
-	"_modifiers": "#m",
-	"_items": "#i",
-	"_feature": "#f",
-	"_being": "#b" 
-	*/
-}
-
 RPG.Serializer.prototype.init = function() {
 	this._classes = [];
 	this._stacks = [];
@@ -142,18 +131,12 @@ RPG.Serializer.prototype._objectToJSON = function(obj, options) {
 			continue;
 		} 
 	
-		/* forward prop translation */
-		if (p in RPG.Serializer.TRANSLATION) { p = RPG.Serializer.TRANSLATION[p]; }
-		
 		result[p] = this._valueToJSON(value, true);
 	}
 	
 	if (options && options.include) {
 		for (var p in options.include) {
 			var value = options.include[p];
-
-			/* forward prop translation */
-			if (p in RPG.Serializer.TRANSLATION) { p = RPG.Serializer.TRANSLATION[p]; }
 
 			result[p] = this._valueToJSON(value, true);
 		}
@@ -289,20 +272,12 @@ RPG.Serializer.Stack.prototype.getData = function() {
  */
 RPG.Parser = OZ.Class();
 
-RPG.Parser.TRANSLATION = {};
-
 RPG.Parser.prototype.init = function() {
 	this._classes = [];
 	this._instances = {}; /* by id, deserialized json */
 	this._done = {}; /* by id, completed instances */
 	this._later = {}; /* object and properties waiting for delayed deserialization */
 	this._revives = [];
-	
-	/* inverse translation table */
-	for (var p in RPG.Serializer.TRANSLATION) {
-		var v = RPG.Serializer.TRANSLATION[p];
-		RPG.Parser.TRANSLATION[v] = p;
-	}
 }
 
 RPG.Parser.prototype.go = function(str) {
@@ -364,14 +339,6 @@ RPG.Parser.prototype.revive = function() {
 RPG.Parser.prototype._parse = function(obj) {
 	for (var p in obj) {
 		var v = obj[p];
-		
-		/* inverse prop translation */
-		if (p in RPG.Parser.TRANSLATION) {
-			delete obj[p];
-			p = RPG.Parser.TRANSLATION[p];
-			obj[p] = v;
-		}
-		
 		if (v === null) { continue; }
 
 		switch (typeof(v)) {

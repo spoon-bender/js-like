@@ -80,6 +80,14 @@ RPG.Misc.Coords.prototype.neighbor = function(dir) {
 	return this.clone().plus(RPG.DIR[dir]);
 }
 
+RPG.Misc.Coords.prototype.toJSON = function(handler) {
+	return handler.toJSON(this, {exclude:"id"});
+}
+
+RPG.Misc.Coords.prototype.revive = function() {
+	this.updateID();
+}
+
 /**
  * Direction to another coords
  * @param {RPG.Misc.Coords} c

@@ -27,6 +27,10 @@ RPG.Beings.PC.prototype.init = function(race, profession) {
 	this.fullStats();
 }
 
+RPG.Beings.PC.prototype.toJSON = function(handler) {
+	return handler.toJSON(this, {exclude:"_visibleCoordsHash"});
+}
+
 RPG.Beings.PC.prototype.getQuests = function() {
 	return this._quests;
 }
@@ -160,7 +164,7 @@ RPG.Beings.PC.prototype.updateVisibility = function() {
 	/* analyze surrounding cells in concentric rings, starting from the center */
 	for (var r=1; r<=R; r++) {
 		cellCount += 8;
-		arcsPerCell = arcCount / cellCount; /* number of arcs per cell */
+		var arcsPerCell = arcCount / cellCount; /* number of arcs per cell */
 		
 		var coords = map.getCoordsInCircle(center, r, true);
 		for (var i=0;i<coords.length;i++) {
