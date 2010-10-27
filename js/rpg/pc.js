@@ -329,7 +329,7 @@ RPG.Beings.PC.prototype.switchPosition = function(coords) {
 		}
 */		
 		var source = this._coords;
-		this.move(cell, true);
+		this.move(coords, true);
 		being.move(source, true);
 	}
 

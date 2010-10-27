@@ -789,7 +789,7 @@ RPG.Story.Village.prototype._nextMazeDungeon = function(staircase) {
 
 	RPG.Decorators.Hidden.getInstance().decorate(map, 0.01);
 	
-	var corners = map.coordsInTwoCorners();
+	var corners = map.getCoordsInTwoCorners();
 
 	/* stairs up */
 	var up = new RPG.Features.Staircase.Up();
