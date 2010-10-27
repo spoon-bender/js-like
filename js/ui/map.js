@@ -27,7 +27,6 @@ RPG.UI.BaseMap.prototype.resize = function(size) {
 		for (var i=0;i<this._size.x;i++) {
 			c.x = i;
 			c.y = j;
-			c.updateID();
 			if (!j) { this._dom.data[i] = new Array(this._size.y); }
 			var cell = new this._cellCtor(this, c);
 			this._dom.data[i][j] = cell;
@@ -84,7 +83,6 @@ RPG.UI.BaseMap.prototype.redrawAll = function() {
 		for (var j=0;j<size.y;j++) {
 			coords.x = i;
 			coords.y = j;
-			coords.updateID();
 			this._redrawCoords(coords);
 		}
 	}

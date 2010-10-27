@@ -32,6 +32,7 @@ RPG.Misc.RandomValue.prototype.add = function(rv) {
  * @class Coordinates
  */
 RPG.Misc.Coords = OZ.Class();
+RPG.Misc.Coords.callers = {};
 RPG.Misc.Coords.fromString = function(str) {
 	var parts = str.split(",");
 	return new this(parseInt(parts[0]), parseInt(parts[1]));
@@ -40,8 +41,6 @@ RPG.Misc.Coords.fromString = function(str) {
 RPG.Misc.Coords.prototype.init = function(x, y) {
 	this.x = x;
 	this.y = y;
-	this.id = "";
-	this.updateID();
 }
 
 RPG.Misc.Coords.prototype.toString = function() {
@@ -61,31 +60,21 @@ RPG.Misc.Coords.prototype.clone = function() {
 RPG.Misc.Coords.prototype.plus = function(c) {
 	this.x += c.x;
 	this.y += c.y;
-	this.updateID();
 	return this;
 }
 
 RPG.Misc.Coords.prototype.minus = function(c) {
 	this.x -= c.x;
 	this.y -= c.y;
-	this.updateID();
 	return this;
 }
 
-RPG.Misc.Coords.prototype.updateID = function() {
-	this.id = this.x + "," + this.y;
+RPG.Misc.Coords.prototype.equals = function(c) {
+	return (this.x == c.x && this.y == c.y);
 }
 
 RPG.Misc.Coords.prototype.neighbor = function(dir) {
 	return this.clone().plus(RPG.DIR[dir]);
-}
-
-RPG.Misc.Coords.prototype.toJSON = function(handler) {
-	return handler.toJSON(this, {exclude:"id"});
-}
-
-RPG.Misc.Coords.prototype.revive = function() {
-	this.updateID();
 }
 
 /**

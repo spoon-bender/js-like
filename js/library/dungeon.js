@@ -320,7 +320,6 @@ RPG.Areas.Shop.prototype.setMap = function(map) {
 			if (i >= this._corner1.x && i <= this._corner2.x && j >= this._corner1.y && j <= this._corner2.y) { continue; }
 			c.x = i;
 			c.y = j;
-			c.updateID();
 			if (this._map.blocks(RPG.BLOCKS_MOVEMENT, c)) { continue; }
 			
 			if (this._door) { throw new Error("Shop cannot have >1 doors"); }

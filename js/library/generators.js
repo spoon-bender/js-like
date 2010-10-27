@@ -127,17 +127,14 @@ RPG.Generators.Uniform.prototype._generateRoom = function() {
 		var corner2 = corner1.clone().plus(dims);
 		corner2.x -= 1;
 		corner2.y -= 1;
-		corner2.updateID();
 		
 		/* enlarge for fitting */
 		var c1 = corner1.clone();
 		c1.x--;
 		c1.y--;
-		c1.updateID();
 		var c2 = corner2.clone();
 		c2.x++;
 		c2.y++;
-		c2.updateID();
 		
 		/* is this one room okay? */
 		var fits = this._freeSpace(c1, c2);
@@ -310,7 +307,6 @@ RPG.Generators.Digger.prototype._firstRoom = function() {
 	var corner2 = corner1.clone().plus(dims);
 	corner2.x -= 1;
 	corner2.y -= 1;
-	corner2.updateID();
 	
 	this._digRoom(corner1, corner2);
 	this._addSurroundingWalls(corner1, corner2);
@@ -385,12 +381,10 @@ RPG.Generators.Digger.prototype._featureRoom = function(wall) {
 		/* corner1 is top-left */
 		corner2.x += width - 1;
 		corner2.y += height - 1;
-		corner2.updateID();
 	} else {
 		/* corner1 is bottom-right, swap */
 		corner1.x -= width + 1;
 		corner1.y -= height + 1;
-		corner1.updateID();
 	}
 	
 	/* shifting */
@@ -464,7 +458,6 @@ RPG.Generators.Digger.prototype._featureCorridor = function(wall) {
 	while (this._isValid(c)) {
 		c.x += direction.x;
 		c.y += direction.y;
-		c.updateID();
 		availSpace++;
 	}
 	availSpace--;
@@ -596,7 +589,6 @@ RPG.Generators.Digger.prototype._emptyDirection = function(coords) {
 	for (var i=0;i<deltas.length;i++) {
 		c.x = coords.x+deltas[i][0];
 		c.y = coords.y+deltas[i][1];
-		c.updateID();
 		
 		if (!this._isValid(c)) { return false; }
 		
@@ -629,7 +621,6 @@ RPG.Generators.Digger.prototype._addSurroundingWalls = function(corner1, corner2
 			if (i == left || i == right || j == top || j == bottom) {
 				c.x = i;
 				c.y = j;
-				c.updateID();
 				this._addFreeWall(c);
 			}
 		}

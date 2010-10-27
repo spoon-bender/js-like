@@ -111,7 +111,7 @@ RPG.Areas.Room.prototype.getCoords = function() {
 	var arr = [];
 	for (var i=this._corner1.x; i<=this._corner2.x; i++) {
 		for (var j=this._corner1.y; j<=this._corner2.y; j++) {
-			arr.push(new RPG.Misc.Coords(i, j).id);
+			arr.push(new RPG.Misc.Coords(i, j));
 		}
 	}
 	return arr;
@@ -207,7 +207,6 @@ RPG.Map.prototype.fromIntMap = function(intMap) {
 		for (var y=0;y<h;y++) {
 			coords.x = x;
 			coords.y = y;
-			coords.updateID();
             var cell = tmpCells[x][y];
 
 			/* passable section */
@@ -227,7 +226,6 @@ RPG.Map.prototype.fromIntMap = function(intMap) {
 				for (var j=minH;j<=maxH;j++) {
 					neighbor.x = i;
 					neighbor.y = j;
-					neighbor.updateID();
 					var neighborCell = tmpCells[i][j];
 					if (!neighborCell.blocks(RPG.BLOCKS_MOVEMENT)) { ok = true; }
 				}
@@ -302,11 +300,11 @@ RPG.Map.prototype.getSound = function() {
 }
 
 RPG.Map.prototype.getMemory = function(coords) {
-	return this._memory[coords.id];
+	return this._memory[coords.x+","+coords.y];
 }
 
 RPG.Map.prototype.setMemory = function(state, coords) {
-	this._setMemory(state, coords.id);
+	this._setMemory(state, coords.x+","+coords.y);
 }
 
 RPG.Map.prototype._setMemory = function(state, id) {
@@ -340,12 +338,13 @@ RPG.Map.prototype.getBeings = function() {
 }
 
 RPG.Map.prototype.getItems = function(coords) {
-	return (this._items[coords.id] || []);
+	return (this._items[coords.x+","+coords.y] || []);
 }
 
 RPG.Map.prototype.addItem = function(item, coords) {
-	if (!(coords.id in this._items)) { this._items[coords.id] = []; }
-	item.mergeInto(this._items[coords.id]);
+	var id = coords.x+","+coords.y;
+	if (!(id in this._items)) { this._items[id] = []; }
+	item.mergeInto(this._items[id]);
 }
 
 RPG.Map.prototype.removeItem = function(item) {
@@ -362,29 +361,31 @@ RPG.Map.prototype.removeItem = function(item) {
 }
 
 RPG.Map.prototype.getFeature = function(coords) {
-	return this._features[coords.id];
+	return this._features[coords.x+","+coords.y];
 }
 
 RPG.Map.prototype.setFeature = function(feature, coords) {
+	var id = coords.x+","+coords.y;
 	if (feature) {
-		this._features[coords.id] = feature;
+		this._features[id] = feature;
 		feature.setMap(this);
 		feature.setCoords(coords);
-	} else if (this._features[coords.id]) {
-		delete this._features[coords.id];
+	} else if (this._features[id]) {
+		delete this._features[id];
 	}
 }
 
 RPG.Map.prototype.getBeing = function(coords) {
-	return this._beings[coords.id];
+	return this._beings[coords.x+","+coords.y];
 }
 
 RPG.Map.prototype.setBeing = function(being, coords, ignoreOldPosition) {
+	var id = coords.x+","+coords.y;
 	if (!being) { /* just remove being. it should be here. */
-		var b = this._beings[coords.id];
+		var b = this._beings[id];
 		if (b) {
 			this.leaving(b);
-			delete this._beings[coords.id];
+			delete this._beings[id];
 		}
 		return;
 	}
@@ -403,7 +404,7 @@ RPG.Map.prototype.setBeing = function(being, coords, ignoreOldPosition) {
 		this.entering(being);
 		being.setMap(this);
 	} else if (!ignoreOldPosition) { /* same map - remove being from old coords */
-		delete this._beings[oldCoords.id];
+		delete this._beings[oldCoords.x+","+oldCoords.y];
 	}
 	
 	if (oldArea != newArea) { /* area change */
@@ -416,20 +417,21 @@ RPG.Map.prototype.setBeing = function(being, coords, ignoreOldPosition) {
 		newCell.entering(being);
 	}
 
-	this._beings[coords.id] = being;
+	this._beings[id] = being;
 	being.setCoords(coords);
 }
 	
 RPG.Map.prototype.getCell = function(coords) {
-	return this._cells[coords.id];
+	return this._cells[coords.x+","+coords.y];
 }
 
 RPG.Map.prototype.setCell = function(cell, coords) {
+	var id = coords.x+","+coords.y;
 	if (cell) {
 		if (cell.isFake()) { cell.hide(this, coords); }
-		this._cells[coords.id] = cell;
-	} else if (this._cells[coords.id]) {
-		delete this._cells[coords.id];
+		this._cells[id] = cell;
+	} else if (this._cells[id]) {
+		delete this._cells[id];
 	}
 }
 
@@ -462,7 +464,8 @@ RPG.Map.prototype.addArea = function(area) {
 	area.setMap(this);
 	var coords = area.getCoords();
 	for (var i=0;i<coords.length;i++) {
-		this._areasByCoords[coords[i]] = area;
+		var id = coords[i].x+","+coords[i].y;
+		this._areasByCoords[id] = area;
 	}
 }
 
@@ -478,7 +481,7 @@ RPG.Map.prototype.getAreas = function() {
  * Get area containing these coordinates
  */
 RPG.Map.prototype.getArea = function(coords) {
-	return this._areasByCoords[coords.id];
+	return this._areasByCoords[coords.x+","+coords.y];
 }
 
 RPG.Map.prototype.getFreeCoords = function(noItems) {
@@ -488,8 +491,7 @@ RPG.Map.prototype.getFreeCoords = function(noItems) {
 		for (var j=0;j<this._size.y;j++) {
 			c.x = i;
 			c.y = j;
-			c.updateID();
-			var id = c.id;
+			var id = c.x+","+c.y;
 			if (!(id in this._cells)) { continue; }
 			if (id in this._features) { continue; }
 			
@@ -525,7 +527,7 @@ RPG.Map.prototype.getCoordsInCircle = function(center, radius, includeInvalid) {
 		if (c.x < 0 || c.y < 0 || c.x >= W || c.y >= H) {
 			if (includeInvalid) { arr.push(null); }
 		} else {
-			if (this._cells[c.id]) {
+			if (this._cells[c.x+","+c.y]) {
 				arr.push(c.clone());
 			} else if (includeInvalid) {
 				arr.push(null);
@@ -571,7 +573,6 @@ RPG.Map.prototype.getCoordsInLine = function(c1, c2) {
 			current[minor] += minorstep;
 			error -= 1;
 		}
-		current.updateID();
 		result.push(current.clone());
 	}
 	
@@ -590,7 +591,7 @@ RPG.Map.prototype.getCoordsInArea = function(center, radius) {
 		var index = -1;
 		for (var i=0;i<result.length;i++) {
 			var item = result[i];
-			if (item[0].id != x.id) { continue; }
+			if (!item[0].equals(x)) { continue; }
 			if (item[1] <= depth) { 
 				return; /* we have this one with better depth */
 			} else {
@@ -690,7 +691,7 @@ RPG.Map.prototype.getCoordsInTwoCorners = function() {
 }
 
 RPG.Map.prototype.blocks = function(what, coords) {
-	var id = coords.id;
+	var id = coords.x+","+coords.y;
 
 	var c = this._cells[id];
 	if (!c) { return true; }
@@ -866,7 +867,6 @@ RPG.Generators.BaseGenerator.prototype._freeSpace = function(corner1, corner2) {
 		for (var j=corner1.y; j<=corner2.y; j++) {
 			c.x = i;
 			c.y = j;
-			c.updateID();
 			if (!this._isValid(c)) { return false; }
 			if (!this._bitMap[i][j]) { return false; }
 		}

@@ -254,8 +254,10 @@ RPG.Items.Projectile.prototype._fly = function() {
 }
 
 RPG.Items.Projectile.prototype._done = function() {
-	this._char = this._baseChar;
-	this._image = this._baseImage;
+	this.setVisual({
+		ch: this._baseChar,
+		image: this._baseImage
+	});
 
 	var coords = this._flight.coords[this._flight.coords.length-1];
 	var map = this._owner.getMap();

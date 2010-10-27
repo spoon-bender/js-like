@@ -136,7 +136,7 @@ RPG.AI.AttackRanged.prototype.go = function() {
 	var target = this._being.getCoords();
 	var trajectory = projectile.computeTrajectory(being.getCoords(), target, being.getMap());
 	var last = trajectory.coords.pop();
-	if (last.id != this._being.getCoords().id) { return RPG.AI_IMPOSSIBLE; } /* some obstacle or we are too far */
+	if (!last.equals(this._being.getCoords())) { return RPG.AI_IMPOSSIBLE; } /* some obstacle or we are too far */
 	
 	var result = being.launch(projectile, last);
 	this._ai.setActionResult(result);
@@ -167,8 +167,8 @@ RPG.AI.AttackMagic.prototype.go = function() {
 			var targetHit = false;
 			for (var j=0;j<trajectory.coords.length;j++) { /* check if target is hit and we are not */
 				var test = trajectory.coords[j];
-				if (test.id == target.id) { targetHit = true; }
-				if (test.id == coords.id) { selfHit = true; }
+				if (test.equals(target)) { targetHit = true; }
+				if (test.equals(coords)) { selfHit = true; }
 			}
 			if (targetHit && !selfHit) { /* launch! */
 				var result = being.cast(spell, i);
@@ -469,7 +469,6 @@ RPG.AI.Shopkeeper.prototype.init = function(being, shop) {
 		for (var j=corner1.y; j<=corner2.y; j++) {
 			c.x = i;
 			c.y = j;
-			c.updateID();
 			if (map.blocks(RPG.BLOCKS_MOVEMENT, c)) { continue; }
 			
 			do {

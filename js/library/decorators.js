@@ -10,7 +10,6 @@ RPG.Decorators.Hidden.prototype.decorate = function(map, percentage) {
 		for (var j=0;j<size.y;j++) {
 			c.x = i;
 			c.y = j;
-			c.updateID();
 			var cell = map.getCell(c);
 			if (!cell) { continue; }
 			
@@ -120,7 +119,6 @@ RPG.Decorators.Doors.prototype.decorate = function(map, room, options) {
 			
 			c.x = i;
 			c.y = j;
-			c.updateID();
 			
 			var cell = map.getCell(c);
 			if (cell instanceof RPG.Cells.Wall) {

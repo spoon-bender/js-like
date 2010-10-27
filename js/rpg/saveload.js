@@ -45,7 +45,7 @@ RPG.Serializer.prototype.go = function() {
 	
 	for (var i=0; i<this._stacks.length; i++) {
 		var stack = this._stacks[i];
-		result[stack.getId()] = stack.getData();
+		result[stack.getID()] = stack.getData();
 	}
 
 	this._stacks = [];
@@ -217,7 +217,7 @@ RPG.Serializer.Stack.prototype.init = function(serializer, ctor) {
 /**
  * Return stack identification
  */
-RPG.Serializer.Stack.prototype.getId = function() {
+RPG.Serializer.Stack.prototype.getID = function() {
 	return "#" + this._index;
 }
 
@@ -238,7 +238,7 @@ RPG.Serializer.Stack.prototype.add = function(instance) {
 		index = this._instances.length;
 		this._instances.push(instance);
 	}
-	return this.getId() + "#" + index;
+	return this.getID() + "#" + index;
 }
 
 /**
