@@ -432,7 +432,6 @@ RPG.Misc.CellFactory = OZ.Class();
 RPG.Misc.CellFactory.prototype.init = function() {
 	this._instances = [];
 }
-
 RPG.Misc.CellFactory.prototype.get = function(ctor) {
 	for (var i=0;i<this._instances.length;i++) {
 		var inst = this._instances[i];
@@ -441,6 +440,12 @@ RPG.Misc.CellFactory.prototype.get = function(ctor) {
 	var inst = new ctor();
 	this._instances.push(inst);
 	return inst;
+}
+RPG.Misc.CellFactory.prototype.toJSON = function(handler) {
+	return this._instances;
+}
+RPG.Misc.CellFactory.prototype.fromJSON = function(instances) {
+	this._instances = instances;
 }
 
 /**

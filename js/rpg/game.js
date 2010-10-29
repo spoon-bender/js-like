@@ -7,7 +7,7 @@ RPG.Game = {
 	_engine: null,
 	_map: null,
 	_events: [],
-	_version: 6
+	_version: 7
 }
 
 RPG.Game.init = function() {
@@ -193,7 +193,8 @@ RPG.Game.toJSON = function(handler) {
 		map: this._map,
 		sound: RPG.UI.sound.getBackground(),
 		status: RPG.UI.status.toJSON(handler),
-		visual: RPG.Visual.toJSON(handler)
+		visual: RPG.Visual.toJSON(handler),
+		cells: RPG.Factories.cells.toJSON(handler)
 	});
 }
 
@@ -208,6 +209,7 @@ RPG.Game.fromJSON = function(data) {
 	RPG.UI.sound.playBackground(data.sound);
 	RPG.UI.status.fromJSON(data.status);
 	RPG.Visual.fromJSON(data.visual);
+	RPG.Factories.cells.fromJSON(data.cells);
 	
 	RPG.UI.map.resize(this._map.getSize());
 	RPG.UI.map.redrawAll(); 
